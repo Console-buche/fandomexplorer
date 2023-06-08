@@ -7,6 +7,7 @@ import {
   CanvasTexture,
   DoubleSide,
   InstancedBufferAttribute,
+  MathUtils,
   Mesh,
   ShaderMaterial,
   Vector2,
@@ -62,6 +63,7 @@ export const GridReactInstanced = ({
       animationProgress: { value: 0 },
       radius: { value: groupLength * 0.5 },
       currentElementId: { value: 0 },
+      uTime: { value: 0 },
       resolution: {
         value: new Vector2(size.width, size.height),
       },
@@ -81,7 +83,18 @@ export const GridReactInstanced = ({
       return null;
     }
 
-    ref.current.rotation.y += (scroll.delta * scrollDirection) / 2;
+    refShaderMat.current.uniforms.uTime.value += 0.01;
+    refShaderMat.current.uniformsNeedUpdate = true;
+    // ref.current.rotation.y += (scroll.delta * scrollDirection) / 2;
+
+    // rotate mesh for tilt effect on scroll
+    const lerpedRot = MathUtils.lerp(
+      ref.current.rotation.z,
+      scrollDirection * 0.01,
+      0.01
+    );
+
+    ref.current.rotation.z = lerpedRot;
   });
 
   const tAnimationProgress = useMemo(() => {

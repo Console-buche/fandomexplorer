@@ -4,6 +4,13 @@ import { FandomScraper } from 'fandomscraper';
 const app = express();
 const port = 3000;
 
+async function getAllChars() {
+  const scraper = new FandomScraper({ name: 'dragon-ball', language: 'en' });
+  const allChars = await scraper.getAll();
+
+  return allChars;
+}
+
 app.get(
   '/characters',
   async (_req: Request<{ page: number }>, res: Response) => {
@@ -26,6 +33,12 @@ app.get(
   }
 );
 
+app.get('/bleh', async (_req: Request, res: Response) => {
+  console.log('getting characters');
+
+  const allChars = await getAllChars();
+  console.log(allChars);
+});
 app.get('/charactersFile', async (_req: Request, res: Response) => {
   try {
     const response = await fetch(
@@ -45,16 +58,9 @@ app.get('/charactersFile', async (_req: Request, res: Response) => {
   }
 });
 
-async function getAllChars() {
-  const scraper = new FandomScraper({ name: 'one-piece', language: 'en' });
-  const allChars = await scraper.getAvailableWikis();
-
-  return allChars;
-}
-
 app.listen(port, async () => {
   console.log(`Server listening at http://localhost:${port}`);
 
-  const allChars = await getAllChars();
-  console.log(allChars);
+  // const allChars = await getAllChars();
+  // console.log(allChars);
 });

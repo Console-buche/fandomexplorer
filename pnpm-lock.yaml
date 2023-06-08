@@ -40,6 +40,7 @@ specifiers:
   react-icons: ^4.8.0
   react-router-dom: ^6.11.1
   three: ^0.149.0
+  three-stdlib: ^2.23.8
   ts-node: ^10.9.1
   typescript: ^4.9.5
   vite: ^4.3.7
@@ -68,6 +69,7 @@ dependencies:
   react-icons: 4.8.0_react@18.2.0
   react-router-dom: 6.11.1_biqbaboplfbrettd7655fr4n2y
   three: 0.149.0
+  three-stdlib: 2.23.8_three@0.149.0
   ts-node: 10.9.1_fypubssz4m7wtqrrhoc7owfyoy
   zod: 3.21.4
   zustand: 4.3.8_react@18.2.0
@@ -1601,7 +1603,7 @@ packages:
       suspend-react: 0.0.8_react@18.2.0
       three: 0.149.0
       three-mesh-bvh: 0.5.24_three@0.149.0
-      three-stdlib: 2.21.11_three@0.149.0
+      three-stdlib: 2.23.8_three@0.149.0
       troika-three-text: 0.47.2_three@0.149.0
       utility-types: 3.10.0
       zustand: 3.7.2_react@18.2.0
@@ -1729,6 +1731,10 @@ packages:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
       '@types/node': 18.16.12
+    dev: false
+
+  /@types/draco3d/1.4.2:
+    resolution: {integrity: sha512-goh23EGr6CLV6aKPwN1p8kBD/7tT5V/bLpToSbarKrwVejqNrspVrv8DhliteYkkhZYrlq/fwKZRRUzH4XN88w==}
     dev: false
 
   /@types/express-serve-static-core/4.17.35:
@@ -2070,10 +2076,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
-
-  /@webgpu/glslang/0.0.15:
-    resolution: {integrity: sha512-niT+Prh3Aff8Uf1MVBVUsaNjFj9rJAKDXuoHIKiQbB+6IUP/3J3JIhBNyZ7lDhytvXxw6ppgnwKZdDJ08UMj4Q==}
-    dev: false
 
   /abab/2.0.6:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
@@ -5332,14 +5334,14 @@ packages:
       three: 0.149.0
     dev: false
 
-  /three-stdlib/2.21.11_three@0.149.0:
-    resolution: {integrity: sha512-fFeaMOc3lpup4A/FrSKHmp/PNYmyxyV8dzMorJpYyZBdIGAn5BmokGSN9ei8t7Wv9thxCW+VLaxA6csxTl5MYg==}
+  /three-stdlib/2.23.8_three@0.149.0:
+    resolution: {integrity: sha512-dsgh7cyz/zMY6E+b4XsMRuLuY1tD81pgR+VtsRsXaqMKCHdMSjtXOerG5zSwMfjWMd9gbVMHvuhTc5atsG6F/w==}
     peerDependencies:
-      three: '>=0.122.0'
+      three: '>=0.128.0'
     dependencies:
-      '@babel/runtime': 7.21.5
+      '@types/draco3d': 1.4.2
       '@types/offscreencanvas': 2019.7.0
-      '@webgpu/glslang': 0.0.15
+      '@types/webxr': 0.5.2
       chevrotain: 10.5.0
       draco3d: 1.5.6
       fflate: 0.6.10

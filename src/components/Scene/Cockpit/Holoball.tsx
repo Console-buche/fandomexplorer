@@ -1,4 +1,4 @@
-import { PerspectiveCamera, RenderTexture } from '@react-three/drei';
+import { Box, PerspectiveCamera, RenderTexture } from '@react-three/drei';
 import { MeshProps } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { Camera, Mesh, Vector3 } from 'three';
@@ -10,22 +10,22 @@ export const Holoball = (props: MeshProps) => {
 
   useEffect(() => {
     if (refCam.current) {
-      refCam.current.lookAt(new Vector3(0, 0, 0));
+      // refCam.current.lookAt(new Vector3(0, 0, 0));
     }
   }, [refCam]);
   return (
-    <mesh ref={ref} {...props} rotation-y={-Math.PI / 2}>
+    <mesh ref={ref} {...props}>
       <planeBufferGeometry args={[5, 5]} />
 
-      <meshBasicMaterial transparent>
+      <meshBasicMaterial transparent depthTest={false}>
         <RenderTexture attach="map" anisotropy={16}>
           <PerspectiveCamera
             ref={refCam}
             makeDefault
             fov={50}
-            manual
             position={[0.2, 0.35, 3.5]}
           />
+          {/* <color attach="background" args={['#FFF']} /> */}
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} />
 

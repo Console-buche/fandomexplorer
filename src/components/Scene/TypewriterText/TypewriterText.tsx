@@ -74,13 +74,13 @@ export const TypewriterText = ({
 
   return (
     <Text position={position}>
-      <shaderMaterial
+      {/* <shaderMaterial
         transparent
         ref={refShader}
         vertexShader={vertexShaderCockpit}
         uniforms={uniforms}
         fragmentShader={fragmentShaderCockpit}
-      />
+      /> */}
       {text}
     </Text>
   );

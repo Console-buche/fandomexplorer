@@ -75,11 +75,12 @@ void main() {
  
 
     // Control opacity based on depth and on lateral distance from center
-    float depthOpacity = 3.-vDepth / 100.;
+    float depthOpacity =   600. / vDepth  * 600. / vDepth - 3.75 ;
+    // float depthOpacity = 3.-vDepth / 140.;
     float depthThreshhold = 3.-vDepth / 20.;
     float center = resolution.x / 2.0;
     float distanceFromCenter = depthThreshhold < 0. ? 0. : abs(gl_FragCoord.x - center);
-    float fadeWidth = resolution.x * 0.45;  // Adjust the fade width as desired
+    float fadeWidth = resolution.x * 0.49;  // Adjust the fade width as desired
 
     // Add a sci-fi border on the selected element
 
@@ -106,7 +107,8 @@ float hollow = (
 
 
 
-  float lateralOpacity = smoothstep(fadeWidth, 0.0, distanceFromCenter);
+  float lateralOpacity = 1.;
+  // float lateralOpacity = smoothstep(fadeWidth, 0.0, distanceFromCenter);
 
   if (hollow == 0. && vIsSelected == 1.) {
 
@@ -114,7 +116,9 @@ float hollow = (
 
   } else {
     
-    float halfBorderSize = borderSize / 1.5;
+    
+    float halfBorderSize = vIsSelected == 1. ? 0.075 : 0.;
+    // float halfBorderSize = borderSize / 1.5;
     
     gl_FragColor = vec4(vec3(color) * 1.1, depthOpacity * lateralOpacity);
 
@@ -123,5 +127,11 @@ float hollow = (
     }
     
   }
+
+  // TODO HERE : implement a per image anim/shape, more natural/organic
+
+  // if ((sin(uTime + vTileIndex / 100. ) + 1.) / 2. < vUv.y && vIsSelected == 0. ) {
+  //   discard;
+  // }
 }
 `;
