@@ -109,12 +109,22 @@ export const AtomInstanced = ({
     refLePos.current.needsUpdate = true;
   });
 
+  const handleOnPointerEnter = () => {
+    setIsSelected(true);
+    updateActiveCharacter(character);
+  };
+
+  const handleOnPointerLeave = () => {
+    setIsSelected(false);
+    updateActiveCharacter(undefined);
+  };
+
   return (
     <>
       <Box
         args={[2, 2, 1]}
-        onPointerEnter={() => setIsSelected(true)} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
-        onPointerLeave={() => setIsSelected(false)} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
+        onPointerEnter={handleOnPointerEnter} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
+        onPointerLeave={handleOnPointerLeave} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
         // onPointerEnter={() => updateActiveCharacter(character)} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
         // onPointerLeave={() => updateActiveCharacter(undefined)}
         ref={refBox}

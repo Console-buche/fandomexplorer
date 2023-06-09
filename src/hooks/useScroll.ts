@@ -1,5 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 
+function isScrollDirection<T extends number>(
+  dir: T | ScrollDirection
+): dir is ScrollDirection {
+  return dir === -1 || dir === 0 || dir === 1;
+}
+
 export type ScrollDirection = -1 | 0 | 1;
 
 const useScrollDirection = (): ScrollDirection => {
@@ -13,7 +19,9 @@ const useScrollDirection = (): ScrollDirection => {
         Math.abs(deltaY) > Math.abs(deltaX)
           ? -Math.sign(deltaY)
           : -Math.sign(deltaX);
-      setScrollDirection(direction);
+      if (isScrollDirection(direction)) {
+        setScrollDirection(direction);
+      }
 
       // Clear the previous scroll timer
       if (scrollTimerRef.current) {
