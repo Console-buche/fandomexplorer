@@ -1,14 +1,9 @@
 import useScrollDirection from '@/hooks/useScroll';
-import {
-  CameraShake,
-  PerspectiveCamera,
-  Plane,
-  Sphere,
-  useScroll,
-} from '@react-three/drei';
+import { PerspectiveCamera, Sphere, useScroll } from '@react-three/drei';
 import { Camera, useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { BackSide, Euler, Matrix4, Mesh, Vector3 } from 'three';
+import { getScrollDeltaFromDirection } from './utils';
 
 function getRotationMatrix(rotation: Vector3): THREE.Matrix4 {
   const euler = new Euler(rotation.x, rotation.y, rotation.z, 'XYZ');
@@ -45,6 +40,10 @@ export const Cam = () => {
   const refSphere = useRef<Mesh>(null);
   const refSphereCast = useRef<Mesh>(null);
 
+  // TODO : get current circle rotation AND radius, and let's go
+  // MAKE STORE
+  const CURRENT_CIRCLE_ROTATION = 0.05;
+
   const scroll = useScroll();
   const scrollDirection = useScrollDirection();
 
@@ -56,45 +55,27 @@ export const Cam = () => {
     }
   }, [refCam]);
 
-  useFrame(({ mouse, clock, camera, raycaster }) => {
+  useFrame(({ clock, camera, raycaster }) => {
     if (!refCam.current || !refSphere.current || !refSphereCast.current) {
       return;
     }
-    t +=
-      scrollDirection === -1
-        ? -scroll.delta * 30
-        : scrollDirection === 1
-        ? scroll.delta * 30
-        : 0;
+    t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 30);
+
     time += clock.getDelta();
-
-    const isMouseWithinBorders =
-      mouse.x > -1 && mouse.x < 1 && mouse.y > -1 && mouse.y < 1;
-
-    const lookAtY = isMouseWithinBorders
-      ? mouse.y * 10 - 50
-      : refLookAt.current.y;
-
-    const lookAtX = isMouseWithinBorders
-      ? 0 + mouse.x * 100
-      : refLookAt.current.x;
-
-    const newLookAt = refLookAt.current.lerp(
-      new Vector3(lookAtX, lookAtY, 0),
-      0.03
-    );
 
     const pos = getPositionOnCircle(
       camera.position,
       CAM_RAD,
       t,
-      new Vector3(0.05, 0, 0)
+      new Vector3(CURRENT_CIRCLE_ROTATION, 0, 0)
     );
     refCam.current?.position.lerp(pos, 0.5);
-    // refCam.current.lookAt(newLookAt);
 
     const sphere = refSphere.current;
     refSphereCast.current.lookAt(camera.position);
+
+    // Note for future me :
+    // getting lookAt from ray, as rotations may be a pain if cam's position is beyond 180deg
 
     raycaster.intersectObject(refSphereCast.current).forEach((i) => {
       sphere.position.copy(i.point);
@@ -105,6 +86,11 @@ export const Cam = () => {
         sphere.position.clone().add(new Vector3(0, -400, 0)),
         0.1
       )
+    );
+
+    refCam.current.rotateOnWorldAxis(
+      new Vector3(1, 0, 0),
+      CURRENT_CIRCLE_ROTATION
     );
   });
 
@@ -127,7 +113,6 @@ export const Cam = () => {
         />
       </Sphere>
       <Sphere ref={refSphere} scale={10} visible={false} />
-      <CameraShake intensity={0.5} pitchFrequency={0.1} />
     </>
   );
 };

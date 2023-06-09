@@ -1,6 +1,6 @@
 import useScrollDirection from '@/hooks/useScroll';
 import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
-import { Instances, useScroll } from '@react-three/drei';
+import { Instances } from '@react-three/drei';
 import { MeshProps, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import {
@@ -33,7 +33,6 @@ export const GridReactInstanced = ({
 }: Grid) => {
   const canvas = useOffscreenCanvasStore((state) => state.offscreenCanvas);
   const refShaderMat = useRef<ShaderMaterial>(null);
-  const scroll = useScroll();
   const scrollDirection = useScrollDirection();
 
   const CharacterBeltMaterial = useMemo(() => {

@@ -1,10 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 
-type UseScrollHookReturnType = -1 | 0 | 1;
+export type ScrollDirection = -1 | 0 | 1;
 
-const useScrollDirection = (): UseScrollHookReturnType => {
-  const [scrollDirection, setScrollDirection] =
-    useState<UseScrollHookReturnType>(0);
+const useScrollDirection = (): ScrollDirection => {
+  const [scrollDirection, setScrollDirection] = useState<ScrollDirection>(0);
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
