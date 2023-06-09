@@ -13,13 +13,12 @@ function getRotationMatrix(rotation: Vector3): THREE.Matrix4 {
 }
 
 function getPositionOnCircle(
-  pos: Vector3,
   radius: number,
   angle: number,
   rotation: Vector3
 ): Vector3 {
   const position = new Vector3();
-  const angleRadians = (angle * Math.PI) / 180; // Convert angle to radians
+  const angleRadians = (angle * Math.PI) / 180;
 
   position.x = radius * Math.cos(angleRadians);
   position.y = -5;
@@ -31,7 +30,6 @@ function getPositionOnCircle(
 }
 
 let t = 0;
-let time = 0;
 const CAM_RAD = 240;
 
 export const Cam = () => {
@@ -61,29 +59,26 @@ export const Cam = () => {
     }
     t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 30);
 
-    time += clock.getDelta();
-
     const pos = getPositionOnCircle(
-      camera.position,
       CAM_RAD,
       t,
       new Vector3(CURRENT_CIRCLE_ROTATION, 0, 0)
     );
-    refCam.current?.position.lerp(pos, 0.5);
+    refCam.current?.position.lerp(
+      pos.add(new Vector3(0, Math.sin(clock.getElapsedTime()), 0)),
+      0.5
+    );
 
     const sphere = refSphere.current;
-    refSphereCast.current.lookAt(camera.position);
 
-    // Note for future me :
-    // getting lookAt from ray, as rotations may be a pain if cam's position is beyond 180deg
-
+    // Getting lookAt from ray, as rotations may be a pain if cam's position is beyond 180deg
     raycaster.intersectObject(refSphereCast.current).forEach((i) => {
       sphere.position.copy(i.point);
     });
 
     refCam.current.lookAt(
       new Vector3().lerp(
-        sphere.position.clone().add(new Vector3(0, -400, 0)),
+        sphere.position.clone().add(new Vector3(0, -200, 0)),
         0.1
       )
     );
