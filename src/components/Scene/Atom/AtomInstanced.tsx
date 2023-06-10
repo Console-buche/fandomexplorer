@@ -55,7 +55,6 @@ export const AtomInstanced = ({
     (state) => state.updateActiveCharacter
   );
   const [isSelected, setIsSelected] = useState(false);
-  // const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
   const currentSearch = useStoreSearch((state) => state.currentSearch);
 
   useEffect(() => {
@@ -111,12 +110,12 @@ export const AtomInstanced = ({
 
   const handleOnPointerEnter = () => {
     setIsSelected(true);
-    updateActiveCharacter(character);
+    // updateActiveCharacter(character);
   };
 
   const handleOnPointerLeave = () => {
     setIsSelected(false);
-    updateActiveCharacter(undefined);
+    // updateActiveCharacter(undefined);
   };
 
   return (
@@ -130,7 +129,7 @@ export const AtomInstanced = ({
         ref={refBox}
         position={pos()} // todo : this isn't shader based and needs updating in a rerender. Trigger rerender when animation is done. And this makes sense, cause you don't want to interact while animating
         material-transparent
-        material-opacity={0}
+        // material-opacity={0}
         material-depthWrite={false}
       />
       <Instance ref={ref} position={pos()} />

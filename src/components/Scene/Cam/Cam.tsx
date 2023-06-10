@@ -17,13 +17,14 @@ function getRotationMatrix(rotation: Vector3): THREE.Matrix4 {
 function getPositionOnCircle(
   radius: number,
   angle: number,
-  rotation: Vector3
+  rotation: Vector3,
+  offsetY = -5
 ): Vector3 {
   const position = new Vector3();
   const angleRadians = (angle * Math.PI) / 180;
 
   position.x = radius * Math.cos(angleRadians);
-  position.y = -5;
+  position.y = offsetY;
   position.z = radius * Math.sin(angleRadians);
 
   const rotationMatrix = getRotationMatrix(rotation);
@@ -68,15 +69,20 @@ export const Cam = () => {
     }
     t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 30);
 
-    const zoom = m
-      ? MathUtils.lerp(refZoom.current, 215, 0.3)
-      : MathUtils.lerp(refZoom.current, CAM_RAD, 0.3);
-    refZoom.current = zoom;
+    // TODO : use zoom and yOffset when focusing on a char ?
+
+    // const zoom = m
+    //   ? MathUtils.lerp(refZoom.current, 215, 0.3)
+    //   : MathUtils.lerp(refZoom.current, CAM_RAD, 0.3);
+    // refZoom.current = zoom;
+
+    // const yOffset = m ? MathUtils.lerp(0, -5, 0.3) : MathUtils.lerp(-5, 0, 0.3);
 
     const pos = getPositionOnCircle(
-      zoom,
+      CAM_RAD,
       t,
-      new Vector3(CURRENT_CIRCLE_ROTATION, 0, 0)
+      new Vector3(CURRENT_CIRCLE_ROTATION, 0, 0),
+      -5
     );
     refCam.current?.position.lerp(
       pos.add(new Vector3(0, Math.sin(clock.getElapsedTime()), 0)),

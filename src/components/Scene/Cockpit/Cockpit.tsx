@@ -38,22 +38,16 @@ export const Cockpit = () => {
   }, [camera.fov]);
 
   useFrame(() => {
-    if (!ref.current) {
-      return;
-    }
-
     // if (scroll.delta > 0) {
     //   scrollTiltBuffer = MathUtils.clamp(scrollTiltBuffer + scroll.delta, 0, 5);
     // } else {
     //   scrollTiltBuffer = MathUtils.clamp(scrollTiltBuffer - 0.03, 0, 2);
     // }
-
     // const lerpedRot = MathUtils.lerp(
     //   ref.current.rotation.z,
     //   scrollTiltBuffer > 2 ? scrollDirection * 0.05 : 0,
     //   0.1
     // );
-
     // ref.current.rotation.z = lerpedRot;
   });
   return (
@@ -70,7 +64,7 @@ export const Cockpit = () => {
         position-x={size.widthAtDepth * 3.9}
         position-y={-size.heightAtDepth}
       />
-      {activeCharacter && <Holodetails character={activeCharacter} />}
+      <Holodetails character={activeCharacter} />
     </ScreenSpace>
   );
 };

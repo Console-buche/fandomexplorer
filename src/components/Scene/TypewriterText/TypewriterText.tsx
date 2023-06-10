@@ -1,23 +1,24 @@
+import { useStoreFandoms } from '@/stores/storeFandoms';
 import { Text } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ShaderMaterial, Vector3 } from 'three';
-import {
-  fragmentShaderCockpit,
-  vertexShaderCockpit,
-} from '../Cockpit/cockpitMaterial.shader';
 
 interface TypewriterTextProps {
-  typewrittenText: string;
+  typewrittenText: string | undefined;
   delay?: number;
   position?: Vector3 | [number, number, number];
 }
 
 export const TypewriterText = ({
   delay = 25,
-  typewrittenText,
+  typewrittenText = '',
   position = [0, 0, 0],
 }: TypewriterTextProps) => {
+  const selectedUniverseName = useStoreFandoms((state) =>
+    state.selectedUniverseName()
+  );
+
   const [text, setText] = useState('');
   const [currentName, setCurrentName] = useState('');
 

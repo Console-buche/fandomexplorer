@@ -60,7 +60,7 @@ export function useQueryGetCharacters(
     getNextPageParam: (lastPage) => getCursor(lastPage.info?.next ?? 'page0'),
     keepPreviousData: true,
     select: selectCharacters,
-    staleTime: Infinity,
+    cacheTime: Infinity,
     ...options,
   });
 }
@@ -95,7 +95,7 @@ export function useQueryGetCharactersFromFile(
     select: (data) =>
       data.map((e) => ({ ...e, image: new TextureLoader().load(e.image) })),
     suspense: true,
-    staleTime: Infinity,
+    cacheTime: Infinity,
     ...options,
   });
 }
@@ -119,7 +119,7 @@ export function useQueryGetCharactersFromFileWithLoadedImages(
     queryFn: selectDataFromLocalFile,
     select: selectData,
     suspense: true,
-    staleTime: Infinity,
+    cacheTime: Infinity,
     ...options,
   });
 }
