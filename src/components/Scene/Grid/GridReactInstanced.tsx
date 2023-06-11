@@ -2,13 +2,14 @@ import useScrollDirection from '@/hooks/useScroll';
 import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
 import { Instances } from '@react-three/drei';
 import { MeshProps, useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   CanvasTexture,
   DoubleSide,
   InstancedBufferAttribute,
   MathUtils,
   Mesh,
+  NormalBlending,
   ShaderMaterial,
   Vector2,
 } from 'three';
@@ -18,6 +19,8 @@ import {
   vertexShaderAtlas,
 } from '../OffscreenCanvas/offscreenCanvas.shader';
 import { useOffscreenCanvasStore } from '../OffscreenCanvas/offscreenCanvas.store';
+import { useStoreCharacter } from '@/stores/storeCharacter';
+import { cp } from 'fs';
 
 type Grid = {
   characters: CharacterSchema[];

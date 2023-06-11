@@ -4,6 +4,8 @@ attribute float tileIndex;
 uniform int elementsCount;
 uniform float radius;
 uniform int currentElementId;
+uniform float uTime; // new uniform for time
+
 varying float vTileIndex;
 attribute vec3 lePos;
 attribute float leIsSelected;
@@ -25,13 +27,22 @@ void main() {
   
   // Calculate the up vector by rotating the direction vector 90 degrees around the Y axis
   vec3 up = vec3(direction.z, 0.0, -direction.x) * -1.;
-    
-  // Calculate the model matrix with rotation and translation
+
+  // Scale factor based on leIsSelected
+  vec3 scale = vec3(1.0);
+  if (leIsSelected > 0.0) {
+    scale = vec3(3.); // Adjust the scaling factor as desired
+  }
+
+  // Set z displacement for selected element
+  float displaceSelectedZ = 3.;
+  
+  // Calculate the model matrix with scaling, rotation, translation, and local z-axis movement
   mat4 modelMatrix = mat4(
-    vec4(up, 0.0),
-    vec4(cross(up, direction), 0.0),
-    vec4(-direction, 0.0),
-    vec4(pos, 1.0)
+    vec4(scale.x * up, 0.0),
+    vec4(scale.y * cross(up, direction), 0.0),
+    vec4(-scale.z * direction, 0.0),
+    vec4(pos + leIsSelected * direction * displaceSelectedZ, 1.0) // Move along the local z-axis if selected
   );
 
   vec4 glPosition = projectionMatrix * modelViewMatrix * modelMatrix * vec4(position, 1.0);
@@ -40,6 +51,7 @@ void main() {
   // Transform the vertex position by the model matrix
   gl_Position = glPosition;
 }
+
 `;
 
 export const fragmentShaderAtlas = `
@@ -110,11 +122,11 @@ float hollow = (
   float lateralOpacity = 1.;
   // float lateralOpacity = smoothstep(fadeWidth, 0.0, distanceFromCenter);
 
-  if (hollow == 0. && vIsSelected == 1.) {
+  // if (hollow == 0. && vIsSelected == 1.) {
 
-    gl_FragColor = vec4(0.3, 0.3, 0.3, depthOpacity * lateralOpacity);
+  //   gl_FragColor = vec4(0.3, 0.3, 0.3, depthOpacity * lateralOpacity);
 
-  } else {
+  // } else {
     
     
     float halfBorderSize = vIsSelected == 1. ? 0.075 : 0.;
@@ -122,11 +134,11 @@ float hollow = (
     
     gl_FragColor = vec4(vec3(color) * 1.1, depthOpacity * lateralOpacity);
 
-    if (vUv.y < halfBorderSize || vUv.y > 1.0 - halfBorderSize || vUv.x > 1.-halfBorderSize || vUv.x < halfBorderSize) {
-      gl_FragColor = vec4(0.);
-    }
+    // if (vUv.y < halfBorderSize || vUv.y > 1.0 - halfBorderSize || vUv.x > 1.-halfBorderSize || vUv.x < halfBorderSize) {
+    //   gl_FragColor = vec4(0.);
+    // }
     
-  }
+  // }
 
   // TODO HERE : implement a per image anim/shape, more natural/organic
 

@@ -1,11 +1,23 @@
 import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
 import { useStoreCharacter } from '@/stores/storeCharacter';
 import { useStoreSearch } from '@/stores/storeSearch';
-import { Box, Instance } from '@react-three/drei';
-import { GroupProps, useFrame } from '@react-three/fiber';
+import { Box, Instance, Plane } from '@react-three/drei';
+import {
+  GroupProps,
+  PlaneBufferGeometryProps,
+  useFrame,
+} from '@react-three/fiber';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { InstancedBufferAttribute, Matrix4, Mesh, Vector3 } from 'three';
+import {
+  BufferGeometry,
+  DoubleSide,
+  InstancedBufferAttribute,
+  Matrix4,
+  Mesh,
+  Vector3,
+} from 'three';
 import { positionOnCircleWithVariation } from '../AtomGroup/utils';
+import { calculateLookAt } from './utils';
 
 type Atom = {
   isActive?: boolean;
@@ -51,11 +63,18 @@ export const AtomInstanced = ({
 }: Atom) => {
   const ref = useRef<Mesh>(null);
   const refBox = useRef<Mesh>(null);
+  const refBoxGeometry = useRef<BufferGeometry>(null);
   const updateActiveCharacter = useStoreCharacter(
     (state) => state.updateActiveCharacter
   );
   const [isSelected, setIsSelected] = useState(false);
   const currentSearch = useStoreSearch((state) => state.currentSearch);
+
+  // useEffect(() => {
+  //   if (refBoxGeometry.current) {
+  //     refBoxGeometry.current.rotateX(Math.PI * 2);
+  //   }
+  // }, [refBoxGeometry]);
 
   useEffect(() => {
     if (isSelected) {
@@ -79,6 +98,16 @@ export const AtomInstanced = ({
       }),
     [groupLength, refLeAnimationProgress, refLesSpeeds, tileIndex]
   );
+
+  useEffect(() => {
+    if (refBox.current) {
+      const [x, y, z] = pos();
+      refBox.current.lookAt(new Vector3(x, y, z));
+      // if (refBox.current) {
+      //   refBox.current.rotateX(Math.PI * 0.5);
+      // }
+    }
+  }, [pos]);
 
   // TODO : don't have to check every frame here ?
   useFrame(({ camera, gl }) => {
@@ -106,6 +135,15 @@ export const AtomInstanced = ({
 
     refLePos.current.setXYZ(tileIndex, ...pos());
     refLePos.current.needsUpdate = true;
+
+    if (refBox.current) {
+      const [x, y, z] = pos();
+      const lookAt = new Vector3().copy(new Vector3(x, y, z)).normalize();
+      refBox.current.lookAt(lookAt);
+      // if (refBox.current) {
+      //   refBox.current.rotateX(Math.PI * 0.5);
+      // }
+    }
   });
 
   const handleOnPointerEnter = () => {
@@ -115,23 +153,22 @@ export const AtomInstanced = ({
 
   const handleOnPointerLeave = () => {
     setIsSelected(false);
+
     // updateActiveCharacter(undefined);
   };
 
   return (
     <>
-      <Box
-        args={[2, 2, 1]}
+      <mesh
         onPointerEnter={handleOnPointerEnter} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
         onPointerLeave={handleOnPointerLeave} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
-        // onPointerEnter={() => updateActiveCharacter(character)} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
-        // onPointerLeave={() => updateActiveCharacter(undefined)}
         ref={refBox}
         position={pos()} // todo : this isn't shader based and needs updating in a rerender. Trigger rerender when animation is done. And this makes sense, cause you don't want to interact while animating
-        material-transparent
-        // material-opacity={0}
-        material-depthWrite={false}
-      />
+      >
+        <planeBufferGeometry args={[3, 3]} ref={refBoxGeometry} />
+        <meshBasicMaterial side={DoubleSide} transparent opacity={0} />
+      </mesh>
+
       <Instance ref={ref} position={pos()} />
     </>
   );
