@@ -9,15 +9,6 @@ import { useEffect } from 'react';
 
 function App() {
   const queryClient = useQueryClient();
-  const selectDefaultUniverse = useStoreFandoms(
-    (state) => state.updateSelectedUniverse
-  );
-
-  // TODO :
-  // Make this more scalable. Write app loader and bundle all the fetching and store setuping before first render
-  useEffect(() => {
-    selectDefaultUniverse('DBZ');
-  }, [selectDefaultUniverse]);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -15,12 +15,14 @@ export const TypewriterText = ({
   typewrittenText = '',
   position = [0, 0, 0],
 }: TypewriterTextProps) => {
-  const selectedUniverseName = useStoreFandoms((state) =>
-    state.selectedUniverseName()
-  );
-
   const [text, setText] = useState('');
   const [currentName, setCurrentName] = useState('');
+
+  const filterBy = useStoreFandoms((state) => state.rickAndMorty.filterBy);
+
+  const updateFilterBy = useStoreFandoms(
+    (state) => state.rickAndMorty.updateFilterBy
+  );
 
   const refShader = useRef<ShaderMaterial>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -82,6 +84,7 @@ export const TypewriterText = ({
         uniforms={uniforms}
         fragmentShader={fragmentShaderCockpit}
       /> */}
+      {JSON.stringify(filterBy)}
       {text}
     </Text>
   );
