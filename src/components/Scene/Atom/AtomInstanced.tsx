@@ -166,7 +166,12 @@ export const AtomInstanced = ({
         position={pos()} // todo : this isn't shader based and needs updating in a rerender. Trigger rerender when animation is done. And this makes sense, cause you don't want to interact while animating
       >
         <planeBufferGeometry args={[3, 3]} ref={refBoxGeometry} />
-        <meshBasicMaterial side={DoubleSide} transparent opacity={0} />
+        <meshBasicMaterial
+          side={DoubleSide}
+          transparent
+          opacity={0}
+          toneMapped
+        />
       </mesh>
 
       <Instance ref={ref} position={pos()} />

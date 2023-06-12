@@ -131,8 +131,12 @@ float hollow = (
     
     float halfBorderSize = vIsSelected == 1. ? 0.075 : 0.;
     // float halfBorderSize = borderSize / 1.5;
+
+      // Apply custom tone mapping to balance out the global tone mapping applied for glowing 
+    vec3 toneMappedColor = pow(color.rgb, vec3(2.));
     
-    gl_FragColor = vec4(vec3(color) * 1.1, depthOpacity * lateralOpacity);
+    // gl_FragColor = vec4(vec3(color) * 1.2, max(0., min(1., depthOpacity * lateralOpacity)));
+    gl_FragColor = vec4(toneMappedColor, max(0., min(1., depthOpacity * lateralOpacity)));
 
     // if (vUv.y < halfBorderSize || vUv.y > 1.0 - halfBorderSize || vUv.x > 1.-halfBorderSize || vUv.x < halfBorderSize) {
     //   gl_FragColor = vec4(0.);

@@ -16,7 +16,8 @@ import useScrollDirection from '@/hooks/useScroll';
 let scrollTiltBuffer = 0;
 
 export const Cockpit = () => {
-  const tex = useTexture('assets/cockpit_cut.png');
+  const tex = useTexture('assets/cockpit_cut_no_layers.png');
+  const texLayerBUttons = useTexture('assets/cockpit_cut_layer_buttons.png');
   const three = useThree();
   const camera = three.camera as PerspectiveCamera;
   const ref = useRef<Mesh>(null);
@@ -59,11 +60,22 @@ export const Cockpit = () => {
         material-map={tex}
         material-alphaTest={0.1}
       />
-      <Holoball
+      <mesh>
+        <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
+        <meshLambertMaterial
+          map={texLayerBUttons} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          alphaTest={0.1}
+          transparent
+          toneMapped={false}
+          emissiveIntensity={100}
+          side={DoubleSide}
+        />
+      </mesh>
+      {/* <Holoball
         position-z={-10}
         position-x={size.widthAtDepth * 3.9}
         position-y={-size.heightAtDepth}
-      />
+      /> */}
       <Holodetails character={activeCharacter} />
     </ScreenSpace>
   );

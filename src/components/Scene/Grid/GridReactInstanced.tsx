@@ -227,6 +227,7 @@ export const GridReactInstanced = ({
           vertexShader={vertexShaderAtlas}
           side={DoubleSide}
           transparent
+          toneMapped={false}
         />
         {characters
           .filter((c) => c.status === status)
