@@ -1,31 +1,41 @@
-import { useStoreCharacter } from '@/stores/storeCharacter';
-import {
-  Box,
-  Plane,
-  ScreenSpace,
-  useScroll,
-  useTexture,
-} from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
-import { DoubleSide, MathUtils, Mesh, PerspectiveCamera } from 'three';
-import { Holoball } from './Holoball';
-import { Holodetails } from './Holodetails/Holodetails';
 import useScrollDirection from '@/hooks/useScroll';
+import { useStoreCharacter } from '@/stores/storeCharacter';
+import { Plane, ScreenSpace, useScroll, useTexture } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef } from 'react';
+import {
+  DoubleSide,
+  MathUtils,
+  Mesh,
+  MeshBasicMaterial,
+  MeshLambertMaterial,
+  MeshStandardMaterial,
+  PerspectiveCamera,
+  ShaderMaterial,
+} from 'three';
+import { Holodetails } from './Holodetails/Holodetails';
+import { fragmentShader, vertexShader } from '../shaders/snow.shader';
 
-let scrollTiltBuffer = 0;
-
+let t = 0;
 export const Cockpit = () => {
-  const tex = useTexture('assets/cockpit_cut_no_layers.png');
-  const texLayerBUttons = useTexture('assets/cockpit_cut_layer_buttons.png');
+  const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
+
+  const tex = useTexture('assets/cockpit_cut_no_layers_v2.png');
+  const texLayerButtons = useTexture('assets/cockpit_cut_layer_buttons_v2.png');
+  const texLayerThreeScreens = useTexture(
+    'assets/cockpit_cut_layer_screen_3_parts.png'
+  );
+  const texLayerScreen = useTexture('assets/cockpit_cut_layer_screen.png');
   const three = useThree();
   const camera = three.camera as PerspectiveCamera;
   const ref = useRef<Mesh>(null);
 
+  const refThreeScreens = useRef<MeshLambertMaterial>(null);
+  const refButtons = useRef<MeshLambertMaterial>(null);
+  const refShaderMaterialScreen = useRef<ShaderMaterial>(null);
+
   const scrollDirection = useScrollDirection();
   const scroll = useScroll();
-
-  const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
 
   const depth = 1;
 
@@ -38,7 +48,28 @@ export const Cockpit = () => {
     return { widthAtDepth, heightAtDepth };
   }, [camera.fov]);
 
-  useFrame(() => {
+  const uniformsScreenShader = useMemo(() => {
+    return {
+      uTime: { value: 0 },
+      uIsImageSelected: { value: 0 },
+      uTexture: { value: texLayerScreen },
+      uActiveImage: { value: undefined },
+      uMouse: { value: [0, 0] },
+      uHover: { value: 0 },
+    };
+  }, [texLayerScreen]);
+
+  useEffect(() => {
+    if (refShaderMaterialScreen.current) {
+      refShaderMaterialScreen.current.uniforms.uIsImageSelected.value =
+        activeCharacter?.image ? 1 : 0;
+      refShaderMaterialScreen.current.uniforms.uActiveImage.value =
+        activeCharacter?.image;
+      refShaderMaterialScreen.current.uniformsNeedUpdate = true;
+    }
+  }, [activeCharacter, refShaderMaterialScreen]);
+
+  useFrame(({ clock }) => {
     // if (scroll.delta > 0) {
     //   scrollTiltBuffer = MathUtils.clamp(scrollTiltBuffer + scroll.delta, 0, 5);
     // } else {
@@ -50,6 +81,26 @@ export const Cockpit = () => {
     //   0.1
     // );
     // ref.current.rotation.z = lerpedRot;
+
+    if (
+      !refThreeScreens.current ||
+      !refButtons.current ||
+      !refShaderMaterialScreen.current
+    ) {
+      return;
+    }
+
+    t++;
+    refButtons.current.emissiveIntensity = Math.abs(
+      Math.sin(clock.getElapsedTime()) * 25
+    );
+
+    refThreeScreens.current.emissiveIntensity = Math.abs(
+      Math.sin(clock.getElapsedTime() * 0.01) * 50
+    );
+
+    refShaderMaterialScreen.current.uniforms.uTime.value =
+      clock.getElapsedTime();
   });
   return (
     <ScreenSpace depth={depth}>
@@ -63,11 +114,48 @@ export const Cockpit = () => {
       <mesh>
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
         <meshLambertMaterial
-          map={texLayerBUttons} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          map={texLayerButtons} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          alphaTest={0.1}
+          ref={refButtons}
+          transparent
+          toneMapped={false}
+          emissive={0xffffff}
+          emissiveMap={texLayerButtons}
+          emissiveIntensity={2}
+        />
+      </mesh>
+
+      <mesh>
+        <planeBufferGeometry
+          args={[size.widthAtDepth + 0.01, size.heightAtDepth + 0.01]}
+        />
+        {/* <meshLambertMaterial
+          map={texLayerScreen} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           alphaTest={0.1}
           transparent
           toneMapped={false}
-          emissiveIntensity={100}
+          side={DoubleSide}
+        /> */}
+        <shaderMaterial
+          ref={refShaderMaterialScreen}
+          transparent
+          uniforms={uniformsScreenShader}
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShader}
+        />
+      </mesh>
+
+      <mesh>
+        <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
+        <meshLambertMaterial
+          map={texLayerThreeScreens} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          alphaTest={0.1}
+          ref={refThreeScreens}
+          transparent
+          toneMapped={false}
+          emissiveMap={texLayerThreeScreens}
+          emissiveIntensity={2}
+          emissive={0xffffff}
           side={DoubleSide}
         />
       </mesh>
@@ -76,7 +164,7 @@ export const Cockpit = () => {
         position-x={size.widthAtDepth * 3.9}
         position-y={-size.heightAtDepth}
       /> */}
-      <Holodetails character={activeCharacter} />
+      {/* <Holodetails character={activeCharacter} scale={0.1} /> */}
     </ScreenSpace>
   );
 };

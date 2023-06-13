@@ -10,8 +10,8 @@ export const Hemi = () => {
       return;
     }
 
-    ref.current.intensity = Math.abs(Math.sin(clock.getElapsedTime()) * 10);
+    // ref.current.intensity = Math.abs(Math.sin(clock.getElapsedTime()) * 10);
   });
 
-  return <ambientLight ref={ref} intensity={10} />;
+  return <ambientLight ref={ref} intensity={2} />;
 };

@@ -99,7 +99,7 @@ export const Cam = () => {
     refCam.current.lookAt(
       new Vector3().lerp(
         sphere.position.clone().add(new Vector3(0, -200, 0)),
-        0.1
+        0.0075
       )
     );
 

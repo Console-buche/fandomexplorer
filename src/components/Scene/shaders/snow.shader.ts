@@ -119,8 +119,9 @@ void main() {
 
     float intensity = tv_noise(vUv, uTime);
 
-        
-    vec2 modifiedUv = vUv * 2. - vec2(0.5, 1.) ;
+vec2 modifiedUv = fract((vUv+vec2(0.05,0.035)) * 12.) ;
+
+
 
 
     vec4 activeImg = texture2D(uActiveImage, modifiedUv);

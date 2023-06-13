@@ -48,8 +48,8 @@ export const SceneGrid = () => {
         <ToneMapping
           adaptive
           resolution={256}
-          middleGrey={0.4}
-          maxLuminance={10.0}
+          middleGrey={0.2}
+          maxLuminance={16.0}
           averageLuminance={0.5}
           adaptationRate={10}
         />
