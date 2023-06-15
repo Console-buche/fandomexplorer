@@ -10,28 +10,48 @@ import {
   MeshBasicMaterial,
   MeshLambertMaterial,
   MeshStandardMaterial,
+  MultiplyBlending,
   PerspectiveCamera,
   ShaderMaterial,
 } from 'three';
 import { Holodetails } from './Holodetails/Holodetails';
 import { fragmentShader, vertexShader } from '../shaders/snow.shader';
+import { getScrollDeltaFromDirection } from '../Cam/utils';
 
 let t = 0;
+let tScrollRight = 0;
+let tScrollLeft = 0;
 export const Cockpit = () => {
   const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
 
-  const tex = useTexture('assets/cockpit_cut_no_layers_v2.png');
-  const texLayerButtons = useTexture('assets/cockpit_cut_layer_buttons_v2.png');
+  const tex = useTexture('assets/cockpit_cut_no_layers_v3.png');
+  const texLayerButtons = useTexture('assets/cockpit_cut_layer_buttons_v3.png');
   const texLayerThreeScreens = useTexture(
     'assets/cockpit_cut_layer_screen_3_parts.png'
   );
+  const texLayerThreeScreensRight = useTexture(
+    'assets/cockpit_cut_layer_screen_3_parts_right.png'
+  );
+  const texLayerThreeScreensCenter = useTexture(
+    'assets/cockpit_cut_layer_screen_3_parts_center.png'
+  );
+  const texLayerThreeScreensLeft = useTexture(
+    'assets/cockpit_cut_layer_screen_3_parts_left.png'
+  );
   const texLayerScreen = useTexture('assets/cockpit_cut_layer_screen.png');
+  const texLayerScreenBorder = useTexture(
+    'assets/cockpit_cut_layer_screen_border.png'
+  );
   const three = useThree();
   const camera = three.camera as PerspectiveCamera;
   const ref = useRef<Mesh>(null);
 
   const refThreeScreens = useRef<MeshLambertMaterial>(null);
+  const refThreeScreensRight = useRef<MeshLambertMaterial>(null);
+  const refThreeScreensCenter = useRef<MeshLambertMaterial>(null);
+  const refThreeScreensLeft = useRef<MeshLambertMaterial>(null);
   const refButtons = useRef<MeshLambertMaterial>(null);
+  const refScreenBorder = useRef<MeshLambertMaterial>(null);
   const refShaderMaterialScreen = useRef<ShaderMaterial>(null);
 
   const scrollDirection = useScrollDirection();
@@ -83,8 +103,12 @@ export const Cockpit = () => {
     // ref.current.rotation.z = lerpedRot;
 
     if (
-      !refThreeScreens.current ||
+      // !refThreeScreens.current ||
+      !refThreeScreensRight.current ||
+      !refThreeScreensCenter.current ||
+      !refThreeScreensLeft.current ||
       !refButtons.current ||
+      !refScreenBorder.current ||
       !refShaderMaterialScreen.current
     ) {
       return;
@@ -95,12 +119,26 @@ export const Cockpit = () => {
       Math.sin(clock.getElapsedTime()) * 25
     );
 
-    refThreeScreens.current.emissiveIntensity = Math.abs(
-      Math.sin(clock.getElapsedTime() * 0.01) * 50
-    );
+    refScreenBorder.current.emissiveIntensity = activeCharacter
+      ? Math.abs(Math.sin(clock.getElapsedTime() * 0.1) * 80 + 10)
+      : 0;
 
     refShaderMaterialScreen.current.uniforms.uTime.value =
       clock.getElapsedTime();
+
+    // refButtons.current.emissiveIntensity = tScroll;
+    refThreeScreensRight.current.emissiveIntensity = tScrollRight;
+    refThreeScreensLeft.current.emissiveIntensity = tScrollLeft;
+    tScrollRight =
+      scroll.delta > 0 && scrollDirection === -1
+        ? Math.min(tScrollRight + 2, 25)
+        : Math.max(tScrollRight - 2, 2);
+
+    tScrollLeft =
+      scroll.delta > 0 && scrollDirection === 1
+        ? Math.min(tScrollLeft + 2, 25)
+        : Math.max(tScrollLeft - 2, 2);
+    // tScroll = getScrollDeltaFromDirection(scrollDirection, scroll.delta, 30);
   });
   return (
     <ScreenSpace depth={depth}>
@@ -111,6 +149,7 @@ export const Cockpit = () => {
         material-map={tex}
         material-alphaTest={0.1}
       />
+
       <mesh>
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
         <meshLambertMaterial
@@ -125,27 +164,39 @@ export const Cockpit = () => {
         />
       </mesh>
 
-      <mesh>
+      <mesh position-z={-0.001} position-y={-0.001}>
         <planeBufferGeometry
           args={[size.widthAtDepth + 0.01, size.heightAtDepth + 0.01]}
         />
-        {/* <meshLambertMaterial
-          map={texLayerScreen} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
-          alphaTest={0.1}
-          transparent
-          toneMapped={false}
-          side={DoubleSide}
-        /> */}
+
         <shaderMaterial
           ref={refShaderMaterialScreen}
           transparent
           uniforms={uniformsScreenShader}
           vertexShader={vertexShader}
           fragmentShader={fragmentShader}
+          toneMapped={false}
         />
       </mesh>
 
-      <mesh>
+      <mesh position-z={-0.0001} position-y={-0.002}>
+        <planeBufferGeometry
+          args={[size.widthAtDepth + 0.01, size.heightAtDepth + 0.01]}
+        />
+        <meshLambertMaterial
+          map={texLayerScreenBorder} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          ref={refScreenBorder}
+          transparent
+          toneMapped={false}
+          emissiveMap={texLayerScreenBorder}
+          emissiveIntensity={5}
+          emissive={0xffffff}
+          side={DoubleSide}
+          opacity={0.1}
+        />
+      </mesh>
+
+      {/* <mesh>
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
         <meshLambertMaterial
           map={texLayerThreeScreens} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
@@ -154,6 +205,50 @@ export const Cockpit = () => {
           transparent
           toneMapped={false}
           emissiveMap={texLayerThreeScreens}
+          emissiveIntensity={2}
+          emissive={0xffffff}
+          side={DoubleSide}
+        />
+      </mesh> */}
+
+      {/* THREE SCREENS PARTS */}
+      <mesh>
+        <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
+        <meshLambertMaterial
+          map={texLayerThreeScreensRight} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          alphaTest={0.1}
+          ref={refThreeScreensRight}
+          transparent
+          toneMapped={false}
+          emissiveMap={texLayerThreeScreensRight}
+          emissiveIntensity={2}
+          emissive={0xffffff}
+          side={DoubleSide}
+        />
+      </mesh>
+      <mesh>
+        <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
+        <meshLambertMaterial
+          map={texLayerThreeScreensCenter} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          alphaTest={0.1}
+          ref={refThreeScreensCenter}
+          transparent
+          toneMapped={false}
+          emissiveMap={texLayerThreeScreensCenter}
+          emissiveIntensity={2}
+          emissive={0xffffff}
+          side={DoubleSide}
+        />
+      </mesh>
+      <mesh>
+        <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
+        <meshLambertMaterial
+          map={texLayerThreeScreensLeft} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          alphaTest={0.1}
+          ref={refThreeScreensLeft}
+          transparent
+          toneMapped={false}
+          emissiveMap={texLayerThreeScreensLeft}
           emissiveIntensity={2}
           emissive={0xffffff}
           side={DoubleSide}

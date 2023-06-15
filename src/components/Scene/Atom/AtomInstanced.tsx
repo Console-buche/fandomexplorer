@@ -29,6 +29,7 @@ type Atom = {
   refLesSpeeds: React.RefObject<InstancedBufferAttribute>;
   refLeTime: React.RefObject<InstancedBufferAttribute>;
   refLeAnimationProgress: React.RefObject<InstancedBufferAttribute>;
+  refLeAnimDisplacement: React.RefObject<InstancedBufferAttribute>;
   refLeIsSelected: React.RefObject<InstancedBufferAttribute>;
 } & GroupProps;
 
@@ -56,6 +57,7 @@ export const AtomInstanced = ({
   tileIndex,
   refLePos,
   refLeAnimationProgress,
+  refLeAnimDisplacement,
   refLesSpeeds,
   refLeTime,
   refLeIsSelected,
@@ -116,16 +118,18 @@ export const AtomInstanced = ({
       !refLePos.current ||
       !refLeAnimationProgress.current ||
       !refLesSpeeds.current ||
-      !refLeIsSelected.current
+      !refLeIsSelected.current ||
+      !refLeAnimDisplacement.current
     ) {
       return;
     }
     time += 1;
 
+    const animationProgress = refLeAnimationProgress.current.getX(tileIndex);
     // animate in
     refLeAnimationProgress.current?.setX(
       tileIndex,
-      refLeAnimationProgress.current.getX(tileIndex) + 0.1 ?? 0
+      animationProgress + 0.1 ?? 0
     );
 
     if (refLeIsSelected.current) {
@@ -134,7 +138,6 @@ export const AtomInstanced = ({
     refLeIsSelected.current.needsUpdate = true;
 
     refLePos.current.setXYZ(tileIndex, ...pos());
-    refLePos.current.needsUpdate = true;
 
     if (refBox.current) {
       const [x, y, z] = pos();
@@ -144,6 +147,28 @@ export const AtomInstanced = ({
       //   refBox.current.rotateX(Math.PI * 0.5);
       // }
     }
+
+    const displacementAnimProgress =
+      refLeAnimDisplacement.current.getX(tileIndex);
+
+    if (isSelected) {
+      refLeAnimDisplacement.current.setX(
+        tileIndex,
+        Math.min(
+          displacementAnimProgress + displacementAnimProgress * 0.25,
+          2.75
+        )
+      );
+      refLeAnimDisplacement.current.needsUpdate = true;
+    } else if (!isSelected) {
+      refLeAnimDisplacement.current.setX(
+        tileIndex,
+        Math.max(displacementAnimProgress - 0.15, 1)
+      );
+      refLeAnimDisplacement.current.needsUpdate = true;
+    }
+
+    refLePos.current.needsUpdate = true;
   });
 
   const handleOnPointerEnter = () => {

@@ -37,6 +37,7 @@ export const GridReactInstanced = ({
   const canvas = useOffscreenCanvasStore((state) => state.offscreenCanvas);
   const refShaderMat = useRef<ShaderMaterial>(null);
   const scrollDirection = useScrollDirection();
+  const { camera } = useThree();
 
   const CharacterBeltMaterial = useMemo(() => {
     const cvn = canvas.get(status);
@@ -51,6 +52,7 @@ export const GridReactInstanced = ({
   const refLeIsSelected = useRef<InstancedBufferAttribute>(null);
   const refLesSpeeds = useRef<InstancedBufferAttribute>(null);
   const refLeTime = useRef<InstancedBufferAttribute>(null);
+  const refLeAnimDisplacement = useRef<InstancedBufferAttribute>(null);
   const refLeAnimationProgress = useRef<InstancedBufferAttribute>(null);
   const { size } = useThree();
 
@@ -64,6 +66,7 @@ export const GridReactInstanced = ({
       elementsCount: { value: groupLength },
       animationProgress: { value: 0 },
       radius: { value: groupLength * 0.5 },
+      camPosition: { value: camera.position.clone() },
       currentElementId: { value: 0 },
       uTime: { value: 0 },
       resolution: {
@@ -97,6 +100,11 @@ export const GridReactInstanced = ({
     );
 
     ref.current.rotation.z = lerpedRot;
+
+    // update cam position
+    // TODO : move this to cam on scroll only. So we don't fire a constant update for no reason
+    refShaderMat.current.uniforms.camPosition.value = camera.position.clone();
+    refShaderMat.current.uniformsNeedUpdate = true;
   });
 
   const tAnimationProgress = useMemo(() => {
@@ -169,6 +177,20 @@ export const GridReactInstanced = ({
     return tIndex;
   }, [groupLength]);
 
+  const leAnimDisplacement = useMemo(() => {
+    const c = Array.from(
+      {
+        length: groupLength,
+      },
+      (_, i) => {
+        return 1;
+      }
+    );
+    const tIndex = new Float32Array(c);
+
+    return tIndex;
+  }, [groupLength]);
+
   const tileIndices = useMemo(() => {
     const idcs = characters.filter((c) => c.status === status).map((c, i) => i);
     return new Float32Array(idcs);
@@ -213,6 +235,13 @@ export const GridReactInstanced = ({
             count={groupLength}
           />
           <instancedBufferAttribute
+            attach="attributes-leAnimDisplacement"
+            array={leAnimDisplacement}
+            itemSize={1}
+            count={groupLength}
+            ref={refLeAnimDisplacement}
+          />
+          <instancedBufferAttribute
             attach="attributes-leIsSelected"
             array={leIsSelected}
             itemSize={1}
@@ -238,6 +267,7 @@ export const GridReactInstanced = ({
               refLeTime={refLeTime}
               refLeIsSelected={refLeIsSelected}
               refLesSpeeds={refLesSpeeds}
+              refLeAnimDisplacement={refLeAnimDisplacement}
               refLeAnimationProgress={refLeAnimationProgress}
               speed={100}
               tileIndex={i}

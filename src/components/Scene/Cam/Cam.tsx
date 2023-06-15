@@ -67,7 +67,7 @@ export const Cam = () => {
     if (!refCam.current || !refSphere.current || !refSphereCast.current) {
       return;
     }
-    t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 30);
+    t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 60);
 
     // TODO : use zoom and yOffset when focusing on a char ?
 

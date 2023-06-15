@@ -1,5 +1,5 @@
 import { useQueryGetCharactersFromFile } from '@/services/getCharacters/useQueryGetCharacters';
-import { ScrollControls, Stars } from '@react-three/drei';
+import { ScrollControls, Sphere, Stars, useScroll } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import {
   Bloom,
@@ -9,11 +9,21 @@ import {
 import { Cam } from './Cam';
 import { Cockpit } from './Cockpit/Cockpit';
 import { GridReactInstanced } from './Grid/GridReactInstanced';
-import { NormalBlending } from 'three';
+import { NormalBlending, SpotLight, Vector3 } from 'three';
 import { Hemi } from './Lights/Hemi';
+import { useEffect, useRef } from 'react';
 
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();
+
+  const scroll = useScroll();
+  const spotLightRef = useRef<SpotLight>(null);
+
+  useEffect(() => {
+    if (spotLightRef.current) {
+      spotLightRef.current.lookAt(new Vector3(0, 0, 0));
+    }
+  }, [spotLightRef]);
 
   const { data } = characterData;
   if (!data) {
@@ -21,9 +31,9 @@ export const SceneGrid = () => {
   }
 
   return (
-    <Canvas gl={{ alpha: true }} dpr={[1, 2]}>
+    <Canvas gl={{ alpha: true, antialias: true }} dpr={[1, 2]}>
       <Hemi />
-      <Stars depth={500} />
+      <Stars depth={1000} factor={10} />
 
       <ScrollControls infinite pages={3} damping={0}>
         <Cam />
@@ -40,6 +50,8 @@ export const SceneGrid = () => {
           roxX={Math.PI / -3}
         />
       </ScrollControls>
+
+      <spotLight position={[0, 0, 240]} ref={spotLightRef} intensity={100} />
 
       <EffectComposer disableNormalPass multisampling={4}>
         {/** The bloom pass is what will create glow, always set the threshold to 1, nothing will glow
