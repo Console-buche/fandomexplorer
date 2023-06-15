@@ -3,9 +3,13 @@ import { Text } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ShaderMaterial, Vector3 } from 'three';
+import Regular from '@pmndrs/assets/fonts/inter_black.woff';
+import Firava from 'fonts/Firava.woff2';
+import Poppins from '@fonts/Poppins-Black.ttf';
 
 interface TypewriterTextProps {
   typewrittenText: string | undefined;
+  prefix?: string;
   delay?: number;
   position?: Vector3 | [number, number, number];
 }
@@ -13,6 +17,7 @@ interface TypewriterTextProps {
 export const TypewriterText = ({
   delay = 25,
   typewrittenText = '',
+  prefix = '',
   position = [0, 0, 0],
 }: TypewriterTextProps) => {
   const [text, setText] = useState('');
@@ -76,7 +81,13 @@ export const TypewriterText = ({
   }, [delay, typewrittenText]);
 
   return (
-    <Text position={position}>
+    <Text
+      position={position}
+      font={Poppins}
+      letterSpacing={-0.025}
+      textAlign="left"
+      anchorX={0}
+    >
       {/* <shaderMaterial
         transparent
         ref={refShader}
@@ -84,8 +95,12 @@ export const TypewriterText = ({
         uniforms={uniforms}
         fragmentShader={fragmentShaderCockpit}
       /> */}
-      {JSON.stringify(filterBy)}
-      {text}
+      [{prefix} {text}
+      <meshStandardMaterial
+        toneMapped={false}
+        emissive="#4B0082"
+        emissiveIntensity={10}
+      />
     </Text>
   );
 };

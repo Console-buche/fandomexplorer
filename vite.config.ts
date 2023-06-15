@@ -1,8 +1,8 @@
-import react from '@vitejs/plugin-react';
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
+import react from '@vitejs/plugin-react';
 import path, { dirname, join } from 'path';
-import { defineConfig } from 'vite';
 import { fileURLToPath } from 'url';
+import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,6 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@fonts': '/fonts',
     },
   },
   server: {

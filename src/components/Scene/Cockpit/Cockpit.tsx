@@ -259,7 +259,7 @@ export const Cockpit = () => {
         position-x={size.widthAtDepth * 3.9}
         position-y={-size.heightAtDepth}
       /> */}
-      {/* <Holodetails character={activeCharacter} scale={0.1} /> */}
+      <Holodetails character={activeCharacter} scale={0.1} />
     </ScreenSpace>
   );
 };

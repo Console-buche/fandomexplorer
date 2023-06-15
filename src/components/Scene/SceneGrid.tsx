@@ -33,7 +33,7 @@ export const SceneGrid = () => {
   return (
     <Canvas gl={{ alpha: true, antialias: true }} dpr={[1, 2]}>
       <Hemi />
-      <Stars depth={1000} factor={10} />
+      <Stars depth={1000} />
 
       <ScrollControls infinite pages={3} damping={0}>
         <Cam />
