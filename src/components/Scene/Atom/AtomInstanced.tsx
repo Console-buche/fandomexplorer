@@ -17,7 +17,7 @@ import {
   Vector3,
 } from 'three';
 import { positionOnCircleWithVariation } from '../AtomGroup/utils';
-import { calculateLookAt } from './utils';
+import { calculateLookAt, filterCharacterByName } from './utils';
 
 type Atom = {
   isActive?: boolean;
@@ -27,6 +27,7 @@ type Atom = {
   character: CharacterSchema;
   refLePos: React.RefObject<InstancedBufferAttribute>;
   refLesSpeeds: React.RefObject<InstancedBufferAttribute>;
+  refLeIsSearchTrue: React.RefObject<InstancedBufferAttribute>;
   refLeTime: React.RefObject<InstancedBufferAttribute>;
   refLeAnimationProgress: React.RefObject<InstancedBufferAttribute>;
   refLeAnimDisplacement: React.RefObject<InstancedBufferAttribute>;
@@ -58,6 +59,7 @@ export const AtomInstanced = ({
   refLePos,
   refLeAnimationProgress,
   refLeAnimDisplacement,
+  refLeIsSearchTrue,
   refLesSpeeds,
   refLeTime,
   refLeIsSelected,
@@ -66,23 +68,34 @@ export const AtomInstanced = ({
   const ref = useRef<Mesh>(null);
   const refBox = useRef<Mesh>(null);
   const refBoxGeometry = useRef<BufferGeometry>(null);
+
   const updateActiveCharacter = useStoreCharacter(
     (state) => state.updateActiveCharacter
   );
   const [isSelected, setIsSelected] = useState(false);
   const currentSearch = useStoreSearch((state) => state.currentSearch);
 
-  // useEffect(() => {
-  //   if (refBoxGeometry.current) {
-  //     refBoxGeometry.current.rotateX(Math.PI * 2);
-  //   }
-  // }, [refBoxGeometry]);
-
   useEffect(() => {
+    const currentChar = character;
     if (isSelected) {
       updateActiveCharacter(character);
+    } else {
+      // FIXME : update only if previous selected character === this char
+      updateActiveCharacter(undefined);
     }
   }, [isSelected, updateActiveCharacter, character]);
+
+  useEffect(() => {
+    const isCharacterFound = filterCharacterByName(character, currentSearch);
+    if (refLeIsSearchTrue.current) {
+      refLeIsSearchTrue.current.setX(
+        tileIndex,
+        isCharacterFound || currentSearch === '' ? 1 : 0
+      );
+
+      refLeIsSearchTrue.current.needsUpdate = true;
+    }
+  }, [refLeIsSearchTrue, currentSearch, character, tileIndex]);
 
   const pos = useCallback(
     (displacementFactor = 0) =>

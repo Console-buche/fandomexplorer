@@ -4,8 +4,6 @@ import { useQueryClient } from './hooks/useQueryClient';
 import { AppRoutes } from './routes';
 import { innerLayoutStyle, layoutStyle } from './style/global.css';
 import './style/index.css';
-import { useStoreFandoms } from './stores/storeFandoms';
-import { useEffect } from 'react';
 
 function App() {
   const queryClient = useQueryClient();

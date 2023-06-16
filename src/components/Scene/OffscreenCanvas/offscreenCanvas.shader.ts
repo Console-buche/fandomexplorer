@@ -9,11 +9,13 @@ attribute vec3 lePos;
 attribute float leIsSelected;
 attribute float speed;
 attribute float leAnimDisplacement;
+attribute float leIsSearchTrue;
 
 varying vec2 vUv;
 varying float vTileIndex;
 varying float vIsSelected;
 varying float vDepth;
+varying float vLeIsSearchTrue;
 
 
 attribute float animationProgress;
@@ -22,6 +24,7 @@ void main() {
   vUv = uv;
   vTileIndex = tileIndex;
   vIsSelected = leIsSelected;
+  vLeIsSearchTrue = leIsSearchTrue;
   
   vec3 pos = lePos;
   
@@ -33,6 +36,9 @@ void main() {
 
   // Scale factor based on leIsSelected
   vec3 scale = vec3(1.0) * leAnimDisplacement; // Adjust the scaling factor as desired
+
+  scale = vLeIsSearchTrue == 0. ? vec3(1., 0.15, 1.) : scale;
+
 
   // Set z displacement for selected element
   float displaceSelectedZ = leAnimDisplacement;
@@ -63,6 +69,7 @@ uniform float uTime; // new uniform for time
 varying float vIsSelected;
 uniform vec3 camPosition;
 
+varying float vLeIsSearchTrue;
 varying float vDepth;
 varying float vTileIndex;
 varying vec2 vUv;
@@ -150,8 +157,13 @@ void main() {
     // Apply custom tone mapping to balance out the global tone mapping applied for glowing 
     vec3 toneMappedColor = pow(color.rgb, vec3(1.5));
 
-    
-    gl_FragColor = vec4(toneMappedColor, max(0., min(1., depthOpacity * lateralOpacity))  ) ;
+
+
+
+
+    float filteredOpacity = vLeIsSearchTrue > 0. ? 1. : .2;
+    gl_FragColor = vec4(toneMappedColor, max(0., min(1., depthOpacity * lateralOpacity)) * filteredOpacity  ) ;
+
 
 
     // TODO HERE : implement a per image anim/shape, more natural/organic

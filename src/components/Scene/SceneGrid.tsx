@@ -12,6 +12,7 @@ import { GridReactInstanced } from './Grid/GridReactInstanced';
 import { NormalBlending, SpotLight, Vector3 } from 'three';
 import { Hemi } from './Lights/Hemi';
 import { useEffect, useRef } from 'react';
+import { useStoreSearch } from '@/stores/storeSearch';
 
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();

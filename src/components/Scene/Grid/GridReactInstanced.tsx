@@ -2,14 +2,13 @@ import useScrollDirection from '@/hooks/useScroll';
 import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
 import { Instances } from '@react-three/drei';
 import { MeshProps, useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import {
   CanvasTexture,
   DoubleSide,
   InstancedBufferAttribute,
   MathUtils,
   Mesh,
-  NormalBlending,
   ShaderMaterial,
   Vector2,
 } from 'three';
@@ -19,8 +18,6 @@ import {
   vertexShaderAtlas,
 } from '../OffscreenCanvas/offscreenCanvas.shader';
 import { useOffscreenCanvasStore } from '../OffscreenCanvas/offscreenCanvas.store';
-import { useStoreCharacter } from '@/stores/storeCharacter';
-import { cp } from 'fs';
 
 type Grid = {
   characters: CharacterSchema[];
@@ -54,6 +51,7 @@ export const GridReactInstanced = ({
   const refLeTime = useRef<InstancedBufferAttribute>(null);
   const refLeAnimDisplacement = useRef<InstancedBufferAttribute>(null);
   const refLeAnimationProgress = useRef<InstancedBufferAttribute>(null);
+  const refLeIsSearchTrue = useRef<InstancedBufferAttribute>(null);
   const { size } = useThree();
 
   const groupLength = characters.filter((cc) => cc.status === status).length;
@@ -191,6 +189,21 @@ export const GridReactInstanced = ({
     return tIndex;
   }, [groupLength]);
 
+  // Size 1, attribute to indicate whether the character is found in current search filter
+  const leIsSearchTrue = useMemo(() => {
+    const c = Array.from(
+      {
+        length: groupLength,
+      },
+      (_, i) => {
+        return 1;
+      }
+    );
+    const tIndex = new Float32Array(c);
+
+    return tIndex;
+  }, [groupLength]);
+
   const tileIndices = useMemo(() => {
     const idcs = characters.filter((c) => c.status === status).map((c, i) => i);
     return new Float32Array(idcs);
@@ -227,6 +240,13 @@ export const GridReactInstanced = ({
             itemSize={1}
             count={groupLength}
             ref={refLeTime}
+          />
+          <instancedBufferAttribute
+            attach="attributes-leIsSearchTrue"
+            array={leIsSearchTrue}
+            itemSize={1}
+            count={groupLength}
+            ref={refLeIsSearchTrue}
           />
           <instancedBufferAttribute
             attach="attributes-tileIndex"
@@ -266,6 +286,7 @@ export const GridReactInstanced = ({
               character={c}
               refLeTime={refLeTime}
               refLeIsSelected={refLeIsSelected}
+              refLeIsSearchTrue={refLeIsSearchTrue}
               refLesSpeeds={refLesSpeeds}
               refLeAnimDisplacement={refLeAnimDisplacement}
               refLeAnimationProgress={refLeAnimationProgress}
