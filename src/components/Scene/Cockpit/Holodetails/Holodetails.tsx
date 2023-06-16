@@ -29,7 +29,7 @@ export const Holodetails = ({ character, ...props }: Holodetails) => {
     return null;
   }
   return (
-    <mesh {...props} position={[-2.5, 1, 0]} rotation-y={0.2}>
+    <mesh {...props} rotation-y={0.2}>
       <TypewriterText
         typewrittenText={character?.status}
         position={[0, 4, -10]}

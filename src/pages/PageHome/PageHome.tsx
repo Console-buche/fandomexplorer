@@ -9,7 +9,7 @@ export const PageHome = () => {
     <Suspense fallback={<div className={pageHomeLoader}>fetching...</div>}>
       <OffscreenCanvasByStatus />
 
-      {/* <NavBar /> */}
+      {/* <SearchTest /> */}
       <PageHomeLayout cards={<SceneGrid />} />
     </Suspense>
   );

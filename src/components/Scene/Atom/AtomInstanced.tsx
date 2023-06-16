@@ -143,9 +143,6 @@ export const AtomInstanced = ({
       const [x, y, z] = pos();
       const lookAt = new Vector3().copy(new Vector3(x, y, z)).normalize();
       refBox.current.lookAt(lookAt);
-      // if (refBox.current) {
-      //   refBox.current.rotateX(Math.PI * 0.5);
-      // }
     }
 
     const displacementAnimProgress =
@@ -155,7 +152,7 @@ export const AtomInstanced = ({
       refLeAnimDisplacement.current.setX(
         tileIndex,
         Math.min(
-          displacementAnimProgress + displacementAnimProgress * 0.25,
+          displacementAnimProgress + displacementAnimProgress * 0.35,
           2.75
         )
       );
@@ -163,7 +160,7 @@ export const AtomInstanced = ({
     } else if (!isSelected) {
       refLeAnimDisplacement.current.setX(
         tileIndex,
-        Math.max(displacementAnimProgress - 0.15, 1)
+        Math.max(displacementAnimProgress - 0.35, 1)
       );
       refLeAnimDisplacement.current.needsUpdate = true;
     }

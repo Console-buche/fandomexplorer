@@ -88,13 +88,6 @@ export const TypewriterText = ({
       textAlign="left"
       anchorX={0}
     >
-      {/* <shaderMaterial
-        transparent
-        ref={refShader}
-        vertexShader={vertexShaderCockpit}
-        uniforms={uniforms}
-        fragmentShader={fragmentShaderCockpit}
-      /> */}
       [{prefix} {text}
       <meshStandardMaterial
         toneMapped={false}
