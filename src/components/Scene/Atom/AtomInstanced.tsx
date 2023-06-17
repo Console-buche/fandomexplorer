@@ -18,6 +18,7 @@ import {
 } from 'three';
 import { positionOnCircleWithVariation } from '../AtomGroup/utils';
 import { calculateLookAt, filterCharacterByName } from './utils';
+import { useStoreFandoms } from '@/stores/storeFandoms';
 
 type Atom = {
   isActive?: boolean;
@@ -68,6 +69,10 @@ export const AtomInstanced = ({
   const ref = useRef<Mesh>(null);
   const refBox = useRef<Mesh>(null);
   const refBoxGeometry = useRef<BufferGeometry>(null);
+
+  const activeStatus = useStoreFandoms(
+    (state) => state.rickAndMorty.activeStatus
+  );
 
   const updateActiveCharacter = useStoreCharacter(
     (state) => state.updateActiveCharacter
@@ -190,11 +195,17 @@ export const AtomInstanced = ({
   });
 
   const handleOnPointerEnter = () => {
+    if (activeStatus !== character.status) {
+      return;
+    }
     setIsSelected(true);
     // updateActiveCharacter(character);
   };
 
   const handleOnPointerLeave = () => {
+    if (activeStatus !== character.status) {
+      return;
+    }
     setIsSelected(false);
 
     // updateActiveCharacter(undefined);
