@@ -1,15 +1,16 @@
-import { useReducer } from 'react';
+import { useState } from 'react';
 import { Holosearch } from './Holosearch';
 
 export const Holocomputer = () => {
-  const [isEditing, setIsEditing] = useReducer((v) => !v, false);
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
     <mesh
       position={[-1, -0.245, 0.1]}
       rotation-y={0.25}
       rotation-x={0.15}
-      onClick={() => setIsEditing()}
+      onPointerEnter={() => setIsEditing(true)}
+      onPointerLeave={() => setIsEditing(false)}
     >
       <planeBufferGeometry args={[0.5, 0.2]} />
       <meshLambertMaterial

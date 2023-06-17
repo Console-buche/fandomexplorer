@@ -17,7 +17,7 @@ export const Search = () => {
   useEffect(() => {
     const timeOut = setTimeout(() => {
       updateSearch(filter);
-    }, 100);
+    }, 1); // no debounce for no, see later is required
 
     return () => {
       clearTimeout(timeOut);
@@ -29,7 +29,6 @@ export const Search = () => {
       style={{ position: 'absolute', opacity: 0, zIndex: -1 }}
       ref={inputSearchRef}
       type="text"
-      placeholder="Search..."
       onChange={(e) => setFilter(e.target.value)}
     />
   );
