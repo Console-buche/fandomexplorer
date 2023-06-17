@@ -1,18 +1,17 @@
 import { useQueryGetCharactersFromFile } from '@/services/getCharacters/useQueryGetCharacters';
-import { ScrollControls, Sphere, Stars, useScroll } from '@react-three/drei';
+import { ScrollControls, Stars, useScroll } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import {
   Bloom,
   EffectComposer,
   ToneMapping,
 } from '@react-three/postprocessing';
+import { useEffect, useRef } from 'react';
+import { SpotLight, Vector3 } from 'three';
 import { Cam } from './Cam';
 import { Cockpit } from './Cockpit/Cockpit';
-import { GridReactInstanced } from './Grid/GridReactInstanced';
-import { NormalBlending, SpotLight, Vector3 } from 'three';
+import { RingGrid } from './Grid/RingGrid';
 import { Hemi } from './Lights/Hemi';
-import { useEffect, useRef } from 'react';
-import { useStoreSearch } from '@/stores/storeSearch';
 
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();
@@ -39,24 +38,14 @@ export const SceneGrid = () => {
       <ScrollControls infinite pages={3} damping={0}>
         <Cam />
         <Cockpit />
-        <GridReactInstanced status="Alive" characters={data} roxX={0.05} />
-        <GridReactInstanced
-          status="Dead"
-          characters={data}
-          roxX={Math.PI / 3}
-        />
-        <GridReactInstanced
-          status="unknown"
-          characters={data}
-          roxX={Math.PI / -3}
-        />
+        <RingGrid status="Alive" characters={data} roxX={0.05} />
+        <RingGrid status="Dead" characters={data} roxX={Math.PI / 3} />
+        <RingGrid status="unknown" characters={data} roxX={Math.PI / -3} />
       </ScrollControls>
 
       <spotLight position={[0, 0, 240]} ref={spotLightRef} intensity={100} />
 
       <EffectComposer disableNormalPass multisampling={4}>
-        {/** The bloom pass is what will create glow, always set the threshold to 1, nothing will glow
-         /*  except materials without tonemapping whose colors leave RGB 0-1 */}
         <Bloom mipmapBlur luminanceThreshold={1} />
         <ToneMapping
           adaptive

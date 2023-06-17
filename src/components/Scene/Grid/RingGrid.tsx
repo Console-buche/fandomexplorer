@@ -28,7 +28,7 @@ type Grid = {
   roxX?: number;
 } & MeshProps;
 
-export const GridReactInstanced = ({
+export const RingGrid = ({
   characters,
   status,
   roxX = 0,
