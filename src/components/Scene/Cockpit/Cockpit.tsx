@@ -15,7 +15,7 @@ export const Cockpit = () => {
       <Holodetails
         character={activeCharacter}
         scale={0.1}
-        position-x={-2.75}
+        position-x={-2.7}
         position-y={1}
       />
       <Holocomputer />

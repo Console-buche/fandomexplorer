@@ -75,15 +75,26 @@ export const AtomInstanced = ({
   const [isSelected, setIsSelected] = useState(false);
   const currentSearch = useStoreSearch((state) => state.currentSearch);
 
+  const previous = useRef<CharacterSchema | undefined>(undefined);
+
   useEffect(() => {
     const currentChar = character;
-    if (isSelected) {
-      updateActiveCharacter(character);
-    } else {
+
+    if (!isSelected && previous.current === character) {
       // FIXME : update only if previous selected character === this char
       updateActiveCharacter(undefined);
     }
-  }, [isSelected, updateActiveCharacter, character]);
+    const timeout = setTimeout(() => {
+      if (isSelected) {
+        updateActiveCharacter(character);
+        previous.current = currentChar;
+      }
+    }, 200);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [isSelected]);
 
   useEffect(() => {
     const isCharacterFound = filterCharacterByName(character, currentSearch);
@@ -164,10 +175,7 @@ export const AtomInstanced = ({
     if (isSelected) {
       refLeAnimDisplacement.current.setX(
         tileIndex,
-        Math.min(
-          displacementAnimProgress + displacementAnimProgress * 0.35,
-          2.75
-        )
+        Math.min(displacementAnimProgress + displacementAnimProgress * 0.35, 2)
       );
       refLeAnimDisplacement.current.needsUpdate = true;
     } else if (!isSelected) {

@@ -1,37 +1,36 @@
-import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
 import { useStoreSearch } from '@/stores/storeSearch';
-import { Checkbox } from './Checkbox';
+import { useEffect, useRef, useState } from 'react';
 
 export const Search = () => {
+  const [filter, setFilter] = useState('');
   const updateSearch = useStoreSearch((state) => state.updateSearch);
-  const updateCurrentStatus = useStoreSearch(
-    (state) => state.updateCurrentStatus
-  );
+  const setInputSearch = useStoreSearch((state) => state.setInputSearch);
+
+  const inputSearchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputSearchRef.current) {
+      setInputSearch(inputSearchRef);
+    }
+  }, [inputSearchRef, setInputSearch]);
+
+  useEffect(() => {
+    const timeOut = setTimeout(() => {
+      updateSearch(filter);
+    }, 100);
+
+    return () => {
+      clearTimeout(timeOut);
+    };
+  }, [filter, updateSearch]);
 
   return (
-    <form>
-      <input
-        type="text"
-        placeholder="Enter name"
-        onChange={(e) => updateSearch(e.target.value)}
-      />
-      <fieldset>
-        <Checkbox<CharacterSchema['status']>
-          value="Alive"
-          onChange={updateCurrentStatus}
-          defaultChecked
-        />
-        <Checkbox<CharacterSchema['status']>
-          value="Dead"
-          onChange={updateCurrentStatus}
-          defaultChecked
-        />
-        <Checkbox<CharacterSchema['status']>
-          value="unknown"
-          onChange={updateCurrentStatus}
-          defaultChecked
-        />
-      </fieldset>
-    </form>
+    <input
+      style={{ position: 'absolute', opacity: 0, zIndex: -1 }}
+      ref={inputSearchRef}
+      type="text"
+      placeholder="Search..."
+      onChange={(e) => setFilter(e.target.value)}
+    />
   );
 };

@@ -11,17 +11,18 @@ interface TypewriterTextProps {
   typewrittenText: string | undefined;
   prefix?: string;
   delay?: number;
+  maxWidth?: number;
   position?: Vector3 | [number, number, number];
 }
 
 export const TypewriterText = ({
   delay = 25,
+  maxWidth,
   typewrittenText = '',
   prefix = '',
   position = [0, 0, 0],
 }: TypewriterTextProps) => {
   const [text, setText] = useState('');
-  const [currentName, setCurrentName] = useState('');
 
   const filterBy = useStoreFandoms((state) => state.rickAndMorty.filterBy);
 
@@ -62,7 +63,6 @@ export const TypewriterText = ({
     let currentIndex = 0;
 
     const animateTypewriter = () => {
-      setCurrentName(typewrittenText); // Update currentName dynamically
       if (currentIndex < typewrittenText.length) {
         currentText += typewrittenText[currentIndex];
         setText(currentText);
@@ -87,8 +87,11 @@ export const TypewriterText = ({
       letterSpacing={-0.025}
       textAlign="left"
       anchorX={0}
+      anchorY={0}
+      maxWidth={maxWidth}
+      overflowWrap="break-word"
     >
-      [{prefix} {text}
+      [{prefix} {text}]
       <meshStandardMaterial
         toneMapped={false}
         emissive="#4B0082"

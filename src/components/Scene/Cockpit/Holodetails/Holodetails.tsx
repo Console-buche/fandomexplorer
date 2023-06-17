@@ -36,11 +36,11 @@ export const Holodetails = ({ character, ...props }: Holodetails) => {
       />
       <TypewriterText
         typewrittenText={getHumanReadableDate(character?.created)}
-        position={[0, 3, -10]}
+        position={[0, 2.75, -10]}
       />
       <TypewriterText
         typewrittenText={character?.name}
-        position={[0, 2, -10]}
+        position={[0, 1.5, -10]}
       />
 
       <TypewriterText
@@ -50,13 +50,14 @@ export const Holodetails = ({ character, ...props }: Holodetails) => {
 
       <TypewriterText
         typewrittenText={character?.origin.name}
-        position={[0, -2, -10]}
+        position={[0, -2.25, -10]}
       />
 
       <TypewriterText
         prefix="ep. "
+        maxWidth={17}
         typewrittenText={getEpisode(character?.episode ?? [])}
-        position={[0, -3, -10]}
+        position={[0, -3.5, -10]}
       />
     </mesh>
   );
