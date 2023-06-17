@@ -99,6 +99,7 @@ export const AtomInstanced = ({
     return () => {
       clearTimeout(timeout);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSelected]);
 
   useEffect(() => {
