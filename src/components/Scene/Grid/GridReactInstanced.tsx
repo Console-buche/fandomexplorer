@@ -11,6 +11,7 @@ import {
   Mesh,
   ShaderMaterial,
   Vector2,
+  Vector3,
 } from 'three';
 import { AtomInstanced } from '../Atom/AtomInstanced';
 import {
@@ -18,6 +19,8 @@ import {
   vertexShaderAtlas,
 } from '../OffscreenCanvas/offscreenCanvas.shader';
 import { useOffscreenCanvasStore } from '../OffscreenCanvas/offscreenCanvas.store';
+import { useStoreFandoms } from '@/stores/storeFandoms';
+import { useStoreCharacter } from '@/stores/storeCharacter';
 
 type Grid = {
   characters: CharacterSchema[];
@@ -34,6 +37,10 @@ export const GridReactInstanced = ({
   const canvas = useOffscreenCanvasStore((state) => state.offscreenCanvas);
   const refShaderMat = useRef<ShaderMaterial>(null);
   const scrollDirection = useScrollDirection();
+  const activeStatus = useStoreFandoms(
+    (state) => state.rickAndMorty.activeStatus
+  );
+  const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
   const { camera } = useThree();
 
   const CharacterBeltMaterial = useMemo(() => {
@@ -74,6 +81,7 @@ export const GridReactInstanced = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+  const activeRingRotSpeed = activeCharacter ? 0 : 0.0001;
 
   useEffect(() => {
     if (ref.current && refShaderMat.current) {
@@ -85,6 +93,9 @@ export const GridReactInstanced = ({
     if (!refShaderMat.current || !ref.current) {
       return null;
     }
+
+    ref.current.rotation.y +=
+      activeStatus !== status ? 0.001 : activeRingRotSpeed;
 
     refShaderMat.current.uniforms.uTime.value += 0.01;
     refShaderMat.current.uniformsNeedUpdate = true;

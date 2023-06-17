@@ -24,10 +24,10 @@ export const TypewriterText = ({
 }: TypewriterTextProps) => {
   const [text, setText] = useState('');
 
-  const filterBy = useStoreFandoms((state) => state.rickAndMorty.filterBy);
+  const filterBy = useStoreFandoms((state) => state.rickAndMorty.activeStatus);
 
   const updateFilterBy = useStoreFandoms(
-    (state) => state.rickAndMorty.updateFilterBy
+    (state) => state.rickAndMorty.updateActiveStatus
   );
 
   const refShader = useRef<ShaderMaterial>(null);
