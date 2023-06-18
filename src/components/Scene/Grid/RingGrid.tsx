@@ -21,6 +21,7 @@ import {
 import { useOffscreenCanvasStore } from '../OffscreenCanvas/offscreenCanvas.store';
 import { useStoreFandoms } from '@/stores/storeFandoms';
 import { useStoreCharacter } from '@/stores/storeCharacter';
+import { AsteroidRing } from '../AsteroidRing/AsteroidRing';
 
 type Grid = {
   characters: CharacterSchema[];
@@ -220,94 +221,99 @@ export const RingGrid = ({
     return new Float32Array(idcs);
   }, [characters, status]);
 
+  const ringRadius = groupLength * 0.475; // TODO : refactor this as a common CONSTANT or prop to atomgrid and this
+
   return (
-    <mesh ref={ref} {...meshProps}>
-      <Instances range={groupLength}>
-        <planeGeometry args={[3, 3]}>
-          <instancedBufferAttribute
-            attach="attributes-animationProgress"
-            array={tAnimationProgress}
-            itemSize={1}
-            ref={refLeAnimationProgress}
-            count={groupLength}
-          />
-          <instancedBufferAttribute
-            ref={refLePos}
-            attach="attributes-lePos"
-            array={lePos}
-            itemSize={3}
-            count={groupLength}
-          />
-          <instancedBufferAttribute
-            attach="attributes-speed"
-            array={tSpeeds}
-            itemSize={1}
-            ref={refLesSpeeds}
-            count={groupLength}
-          />
-          <instancedBufferAttribute
-            attach="attributes-time"
-            array={tTimes}
-            itemSize={1}
-            count={groupLength}
-            ref={refLeTime}
-          />
-          <instancedBufferAttribute
-            attach="attributes-leIsSearchTrue"
-            array={leIsSearchTrue}
-            itemSize={1}
-            count={groupLength}
-            ref={refLeIsSearchTrue}
-          />
-          <instancedBufferAttribute
-            attach="attributes-tileIndex"
-            array={tileIndices}
-            itemSize={1}
-            count={groupLength}
-          />
-          <instancedBufferAttribute
-            attach="attributes-leAnimDisplacement"
-            array={leAnimDisplacement}
-            itemSize={1}
-            count={groupLength}
-            ref={refLeAnimDisplacement}
-          />
-          <instancedBufferAttribute
-            attach="attributes-leIsSelected"
-            array={leIsSelected}
-            itemSize={1}
-            count={groupLength}
-            ref={refLeIsSelected}
-          />
-        </planeGeometry>
-        <shaderMaterial
-          ref={refShaderMat}
-          uniforms={uniforms}
-          fragmentShader={fragmentShaderAtlas}
-          vertexShader={vertexShaderAtlas}
-          side={DoubleSide}
-          transparent
-          toneMapped={false}
-        />
-        {characters
-          .filter((c) => c.status === status)
-          .map((c, i) => (
-            <AtomInstanced
-              key={c.id}
-              character={c}
-              refLeTime={refLeTime}
-              refLeIsSelected={refLeIsSelected}
-              refLeIsSearchTrue={refLeIsSearchTrue}
-              refLesSpeeds={refLesSpeeds}
-              refLeAnimDisplacement={refLeAnimDisplacement}
-              refLeAnimationProgress={refLeAnimationProgress}
-              speed={100}
-              tileIndex={i}
-              groupLength={groupLength}
-              refLePos={refLePos}
+    <group>
+      <AsteroidRing radius={ringRadius} rotation-x={roxX - Math.PI * 0.5} />
+      <mesh ref={ref} {...meshProps}>
+        <Instances range={groupLength}>
+          <planeGeometry args={[3, 3]}>
+            <instancedBufferAttribute
+              attach="attributes-animationProgress"
+              array={tAnimationProgress}
+              itemSize={1}
+              ref={refLeAnimationProgress}
+              count={groupLength}
             />
-          ))}
-      </Instances>
-    </mesh>
+            <instancedBufferAttribute
+              ref={refLePos}
+              attach="attributes-lePos"
+              array={lePos}
+              itemSize={3}
+              count={groupLength}
+            />
+            <instancedBufferAttribute
+              attach="attributes-speed"
+              array={tSpeeds}
+              itemSize={1}
+              ref={refLesSpeeds}
+              count={groupLength}
+            />
+            <instancedBufferAttribute
+              attach="attributes-time"
+              array={tTimes}
+              itemSize={1}
+              count={groupLength}
+              ref={refLeTime}
+            />
+            <instancedBufferAttribute
+              attach="attributes-leIsSearchTrue"
+              array={leIsSearchTrue}
+              itemSize={1}
+              count={groupLength}
+              ref={refLeIsSearchTrue}
+            />
+            <instancedBufferAttribute
+              attach="attributes-tileIndex"
+              array={tileIndices}
+              itemSize={1}
+              count={groupLength}
+            />
+            <instancedBufferAttribute
+              attach="attributes-leAnimDisplacement"
+              array={leAnimDisplacement}
+              itemSize={1}
+              count={groupLength}
+              ref={refLeAnimDisplacement}
+            />
+            <instancedBufferAttribute
+              attach="attributes-leIsSelected"
+              array={leIsSelected}
+              itemSize={1}
+              count={groupLength}
+              ref={refLeIsSelected}
+            />
+          </planeGeometry>
+          <shaderMaterial
+            ref={refShaderMat}
+            uniforms={uniforms}
+            fragmentShader={fragmentShaderAtlas}
+            vertexShader={vertexShaderAtlas}
+            side={DoubleSide}
+            transparent
+            toneMapped={false}
+          />
+          {characters
+            .filter((c) => c.status === status)
+            .map((c, i) => (
+              <AtomInstanced
+                key={c.id}
+                character={c}
+                refLeTime={refLeTime}
+                refLeIsSelected={refLeIsSelected}
+                refLeIsSearchTrue={refLeIsSearchTrue}
+                refLesSpeeds={refLesSpeeds}
+                refLeAnimDisplacement={refLeAnimDisplacement}
+                refLeAnimationProgress={refLeAnimationProgress}
+                speed={100}
+                tileIndex={i}
+                groupLength={groupLength}
+                refLePos={refLePos}
+              />
+            ))}
+        </Instances>
+      </mesh>
+    </group>
   );
 };

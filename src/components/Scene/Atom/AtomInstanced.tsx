@@ -229,7 +229,7 @@ export const AtomInstanced = ({
         />
       </mesh>
 
-      <Instance ref={ref} position={pos()} />
+      <Instance ref={ref} position={pos()} renderOrder={1} />
     </>
   );
 };
