@@ -1,6 +1,6 @@
 export const vertexShaderAtlas = `
 attribute float tileIndex;
-uniform int elementsCount;
+uniform float elementsCount;
 uniform float radius;
 uniform int currentElementId;
 uniform float uTime; // new uniform for time
@@ -10,13 +10,14 @@ attribute float leIsSelected;
 attribute float speed;
 attribute float leAnimDisplacement;
 attribute float leIsSearchTrue;
+attribute float leIsShrinkAnimProgress;
 
 varying vec2 vUv;
 varying float vTileIndex;
 varying float vIsSelected;
 varying float vDepth;
 varying float vLeIsSearchTrue;
-
+varying float vLeIsShrinkAnimProgress;
 
 attribute float animationProgress;
 
@@ -25,6 +26,7 @@ void main() {
   vTileIndex = tileIndex;
   vIsSelected = leIsSelected;
   vLeIsSearchTrue = leIsSearchTrue;
+  vLeIsShrinkAnimProgress= leIsShrinkAnimProgress;
   
   vec3 pos = lePos;
   
@@ -35,13 +37,15 @@ void main() {
   vec3 up = vec3(direction.z, 0.0, -direction.x) * -1.;
 
   // Scale factor based on leIsSelected
-  vec3 scale = vec3(1.0) * leAnimDisplacement; // Adjust the scaling factor as desired
 
-  scale = vLeIsSearchTrue == 0. ? vec3(1., 0.15, 1.) : scale;
+vec3 scale =  vec3(1., leIsShrinkAnimProgress, 1.);
 
+  scale = leIsSelected == 1. && leIsSearchTrue == 1. ? mix(scale, vec3(1.25), leAnimDisplacement) : scale ; // Adjust the scaling factor as desired
+
+  
 
   // Set z displacement for selected element
-  float displaceSelectedZ = leAnimDisplacement;
+  float displaceSelectedZ = leIsSearchTrue == 1. ? leAnimDisplacement : 0.;
   
   // Calculate the model matrix with scaling, rotation, translation, and local z-axis movement
   mat4 modelMatrix = mat4(
@@ -51,13 +55,42 @@ void main() {
     vec4(pos +  direction * displaceSelectedZ, 1.0) // Move along the local z-axis if selected
   );
 
-  vec4 glPosition = projectionMatrix * modelViewMatrix * modelMatrix * vec4(position, 1.0);
-  vDepth = glPosition.z;
+  vec3 lePos = position;
+  float verticesInMyElement = 20.;
+  float waveAmplitude = vLeIsSearchTrue == 1. ?  0. : mix(0., 10., 1.-leIsShrinkAnimProgress);
+  float waveFreq = vLeIsSearchTrue == 1. ?  0. : mix(0., 2000., 1.-leIsShrinkAnimProgress);
+  float waveSpeed = vLeIsSearchTrue == 1. ?  1. :  mix(0., 20., 1.-leIsShrinkAnimProgress);
+
+  float globalVertexIndex = vTileIndex * verticesInMyElement + vUv.x * verticesInMyElement;
+
+  // Add a per-element offset to each vertex based on tileIndex and vUv.x
+  float elementOffset = sin(tileIndex * 0.1 + vUv.x * 6.2831) * 0.5; // Adjust the offset as desired
   
+  float angle = 2.0 * 3.1415926535897932384626433832795 * ((globalVertexIndex + elementOffset) / (float(elementsCount) * verticesInMyElement));
+
+  // Apply a separate wave effect for the internal portion (uv.x between 0.1 and 0.9)
+
+  if (leIsSearchTrue == 0.) {
+
+  if (vUv.x > 0.1 && vUv.x < 0.9) {
+    float internalWaveAmplitude = mix(0., vUv.x, 1.-leIsShrinkAnimProgress); // Adjust the amplitude for the internal portion
+    float internalWaveFreq = mix(0., 500., 1.-leIsShrinkAnimProgress); // Adjust the frequency for the internal portion
+    lePos.y += mix(0., sin(uTime * waveSpeed + angle * internalWaveFreq) * internalWaveAmplitude, 1.-leIsShrinkAnimProgress);
+  } else {
+    lePos.y += mix(0., sin(uTime * waveSpeed + angle * waveFreq) * waveAmplitude, 1.-leIsShrinkAnimProgress);
+  }
+
+}
+
+lePos.y = mix(position.y, lePos.y , 1.-leIsShrinkAnimProgress);
+    
+  
+  vec4 glPosition = projectionMatrix * modelViewMatrix * modelMatrix * vec4(lePos, 1.0);
+  vDepth = glPosition.z;
+
   // Transform the vertex position by the model matrix
   gl_Position = glPosition;
 }
-
 `;
 
 export const fragmentShaderAtlas = `
@@ -72,6 +105,7 @@ uniform vec3 camPosition;
 varying float vLeIsSearchTrue;
 varying float vDepth;
 varying float vTileIndex;
+varying float vLeIsShrinkAnimProgress;
 varying vec2 vUv;
 
 
@@ -165,6 +199,14 @@ void main() {
     gl_FragColor = vec4(toneMappedColor, max(0., min(1., depthOpacity * lateralOpacity)) * filteredOpacity  ) ;
 
 
+
+    // STYLE if is not found in search
+
+    float style = vLeIsSearchTrue == 1. ? 1. : 10.;
+
+    if (vLeIsSearchTrue == 0.) {
+    gl_FragColor *= mix(1., sin(uTime  + vTileIndex * uv.x * 0.1  ) * .1 + 10., 1.-vLeIsShrinkAnimProgress);
+    }
 
     // TODO HERE : implement a per image anim/shape, more natural/organic
 

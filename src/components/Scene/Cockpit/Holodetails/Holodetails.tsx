@@ -25,9 +25,6 @@ function getHumanReadableDate(date: string | undefined) {
 export const Holodetails = ({ character, ...props }: Holodetails) => {
   const type = character?.type ? ` - ${character?.type}` : '';
 
-  if (!character) {
-    return null;
-  }
   return (
     <mesh {...props} rotation-y={0.2}>
       <TypewriterText
@@ -44,7 +41,7 @@ export const Holodetails = ({ character, ...props }: Holodetails) => {
       />
 
       <TypewriterText
-        typewrittenText={`${character?.gender}${type}`}
+        typewrittenText={`${character?.gender ? character.gender : ''}${type}`}
         position={[0, -1, -10]}
       />
 

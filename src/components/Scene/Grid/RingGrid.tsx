@@ -1,5 +1,7 @@
 import useScrollDirection from '@/hooks/useScroll';
 import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
+import { useStoreCharacter } from '@/stores/storeCharacter';
+import { useStoreFandoms } from '@/stores/storeFandoms';
 import { Instances } from '@react-three/drei';
 import { MeshProps, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
@@ -11,28 +13,25 @@ import {
   Mesh,
   ShaderMaterial,
   Vector2,
-  Vector3,
 } from 'three';
+import { AsteroidRing } from '../AsteroidRing/AsteroidRing';
 import { AtomInstanced } from '../Atom/AtomInstanced';
 import {
   fragmentShaderAtlas,
   vertexShaderAtlas,
 } from '../OffscreenCanvas/offscreenCanvas.shader';
 import { useOffscreenCanvasStore } from '../OffscreenCanvas/offscreenCanvas.store';
-import { useStoreFandoms } from '@/stores/storeFandoms';
-import { useStoreCharacter } from '@/stores/storeCharacter';
-import { AsteroidRing } from '../AsteroidRing/AsteroidRing';
 
 type Grid = {
   characters: CharacterSchema[];
   status: CharacterSchema['status'];
-  roxX?: number;
+  rotX?: number;
 } & MeshProps;
 
 export const RingGrid = ({
   characters,
   status,
-  roxX = 0,
+  rotX = 0,
   ...meshProps
 }: Grid) => {
   const canvas = useOffscreenCanvasStore((state) => state.offscreenCanvas);
@@ -59,6 +58,7 @@ export const RingGrid = ({
   const refLeTime = useRef<InstancedBufferAttribute>(null);
   const refLeAnimDisplacement = useRef<InstancedBufferAttribute>(null);
   const refLeAnimationProgress = useRef<InstancedBufferAttribute>(null);
+  const refLeIsShrinkAnimProgress = useRef<InstancedBufferAttribute>(null);
   const refLeIsSearchTrue = useRef<InstancedBufferAttribute>(null);
   const { size } = useThree();
 
@@ -86,9 +86,9 @@ export const RingGrid = ({
 
   useEffect(() => {
     if (ref.current && refShaderMat.current) {
-      ref.current.rotation.x = roxX;
+      ref.current.rotation.x = rotX;
     }
-  }, [ref, roxX]);
+  }, [ref, rotX]);
 
   useFrame(() => {
     if (!refShaderMat.current || !ref.current) {
@@ -216,6 +216,21 @@ export const RingGrid = ({
     return tIndex;
   }, [groupLength]);
 
+  // Size 1, attribute to indicate whether the character is found in current search filter
+  const leIsShrinkAnimProgress = useMemo(() => {
+    const c = Array.from(
+      {
+        length: groupLength,
+      },
+      (_, i) => {
+        return 0;
+      }
+    );
+    const tIndex = new Float32Array(c);
+
+    return tIndex;
+  }, [groupLength]);
+
   const tileIndices = useMemo(() => {
     const idcs = characters.filter((c) => c.status === status).map((c, i) => i);
     return new Float32Array(idcs);
@@ -225,10 +240,10 @@ export const RingGrid = ({
 
   return (
     <group>
-      <AsteroidRing radius={ringRadius} rotation-x={roxX - Math.PI * 0.5} />
+      <AsteroidRing radius={ringRadius} rotation-x={rotX - Math.PI * 0.5} />
       <mesh ref={ref} {...meshProps}>
         <Instances range={groupLength}>
-          <planeGeometry args={[3, 3]}>
+          <planeGeometry args={[3, 3, 20, 20]}>
             <instancedBufferAttribute
               attach="attributes-animationProgress"
               array={tAnimationProgress}
@@ -263,6 +278,13 @@ export const RingGrid = ({
               itemSize={1}
               count={groupLength}
               ref={refLeIsSearchTrue}
+            />
+            <instancedBufferAttribute
+              attach="attributes-leIsShrinkAnimProgress"
+              array={leIsShrinkAnimProgress}
+              itemSize={1}
+              count={groupLength}
+              ref={refLeIsShrinkAnimProgress}
             />
             <instancedBufferAttribute
               attach="attributes-tileIndex"
@@ -306,6 +328,7 @@ export const RingGrid = ({
                 refLesSpeeds={refLesSpeeds}
                 refLeAnimDisplacement={refLeAnimDisplacement}
                 refLeAnimationProgress={refLeAnimationProgress}
+                refLeIsShrinkAnimProgress={refLeIsShrinkAnimProgress}
                 speed={100}
                 tileIndex={i}
                 groupLength={groupLength}

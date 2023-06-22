@@ -31,6 +31,7 @@ type Atom = {
   refLeIsSearchTrue: React.RefObject<InstancedBufferAttribute>;
   refLeTime: React.RefObject<InstancedBufferAttribute>;
   refLeAnimationProgress: React.RefObject<InstancedBufferAttribute>;
+  refLeIsShrinkAnimProgress: React.RefObject<InstancedBufferAttribute>;
   refLeAnimDisplacement: React.RefObject<InstancedBufferAttribute>;
   refLeIsSelected: React.RefObject<InstancedBufferAttribute>;
 } & GroupProps;
@@ -59,6 +60,7 @@ export const AtomInstanced = ({
   tileIndex,
   refLePos,
   refLeAnimationProgress,
+  refLeIsShrinkAnimProgress,
   refLeAnimDisplacement,
   refLeIsSearchTrue,
   refLesSpeeds,
@@ -149,7 +151,9 @@ export const AtomInstanced = ({
       !refLeAnimationProgress.current ||
       !refLesSpeeds.current ||
       !refLeIsSelected.current ||
-      !refLeAnimDisplacement.current
+      !refLeAnimDisplacement.current ||
+      !refLeIsShrinkAnimProgress.current ||
+      !refLeIsSearchTrue.current
     ) {
       return;
     }
@@ -175,6 +179,22 @@ export const AtomInstanced = ({
       refBox.current.lookAt(lookAt);
     }
 
+    // SEARCH TRUE ANIM
+    const isSearchTrue = refLeIsSearchTrue.current.getX(tileIndex);
+    if (isSearchTrue) {
+      refLeIsShrinkAnimProgress.current.setX(
+        tileIndex,
+        Math.min(refLeIsShrinkAnimProgress.current.getX(tileIndex) + 0.4, 1)
+      );
+    } else {
+      refLeIsShrinkAnimProgress.current.setX(
+        tileIndex,
+        Math.max(refLeIsShrinkAnimProgress.current.getX(tileIndex) - 0.1, 0.05)
+      );
+    }
+    refLeIsShrinkAnimProgress.current.needsUpdate = true;
+
+    // SELECTION (CLICK/HOVER) ANIM
     const displacementAnimProgress =
       refLeAnimDisplacement.current.getX(tileIndex);
 
@@ -225,6 +245,7 @@ export const AtomInstanced = ({
           side={DoubleSide}
           transparent
           opacity={0}
+          depthWrite={false}
           toneMapped
         />
       </mesh>
