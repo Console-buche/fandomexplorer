@@ -205,6 +205,16 @@ void main() {
     float style = vLeIsSearchTrue == 1. ? 1. : 10.;
 
     if (vLeIsSearchTrue == 0.) {
+        // vec3 zapColor = vec3(0.0, 0.0, 0.0);
+        // if (uv.x < 0.1 && uv.x > 0.9) {
+        //     zapColor = vec3(0.133333, 0.047059, 0.890196);
+        // }
+        // if (uv.x > 0.1 && uv.x< 0.9) {
+        //     zapColor = vec3(0.105882, 0.890196, 0.047059);
+        // }
+        // if (uv.x > 0.4 && uv.x < 0.6) {
+        //     zapColor = vec3(0.701961, 0.047059, 0.890196);
+        // }
     gl_FragColor *= mix(1., sin(uTime  + vTileIndex * uv.x * 0.1  ) * .1 + 10., 1.-vLeIsShrinkAnimProgress);
     }
 

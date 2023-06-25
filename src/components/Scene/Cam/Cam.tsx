@@ -1,22 +1,28 @@
 import useScrollDirection from '@/hooks/useScroll';
-import { useStoreCharacter } from '@/stores/storeCharacter';
 import { useStoreFandoms } from '@/stores/storeFandoms';
-import { Box, PerspectiveCamera, useScroll } from '@react-three/drei';
+import { PerspectiveCamera, useScroll } from '@react-three/drei';
 import { Camera, useFrame } from '@react-three/fiber';
-import { useEffect, useRef } from 'react';
-import { Euler, MathUtils, Matrix4, Mesh, Quaternion, Vector3 } from 'three';
+import { useRef } from 'react';
+import { Euler, MathUtils, Matrix4, Vector3 } from 'three';
 import { getScrollDeltaFromDirection } from './utils';
 
-function getRotationMatrix(rotation: Vector3): Matrix4 {
-  const euler = new Euler(rotation.x, rotation.y, rotation.z, 'XYZ');
-  const rotationMatrix = new Matrix4();
-  rotationMatrix.makeRotationFromEuler(euler);
-  return rotationMatrix;
+function getBezierPoint(
+  t: number,
+  p0: Vector3,
+  p1: Vector3,
+  p2: Vector3
+): Vector3 {
+  const oneMinusT = 1 - t;
+  return new Vector3(
+    oneMinusT * oneMinusT * p0.x + 2 * oneMinusT * t * p1.x + t * t * p2.x,
+    oneMinusT * oneMinusT * p0.y + 2 * oneMinusT * t * p1.y + t * t * p2.y,
+    oneMinusT * oneMinusT * p0.z + 2 * oneMinusT * t * p1.z + t * t * p2.z
+  );
 }
 
 function getPositionOnCircle(radius: number, angle: number): Vector3 {
   const position = new Vector3();
-  const angleRadians = (angle * Math.PI) / 180;
+  const angleRadians = (angle * Math.PI + 100) / 180;
 
   const normalizedPosition = new Vector3(
     Math.cos(angleRadians),
@@ -35,7 +41,7 @@ let t = 0;
 
 export const Cam = () => {
   const refCam = useRef<Camera>(null);
-  const refBox = useRef<Mesh>(null);
+  const prevRotX = useRef<number>(0);
 
   const activeStatus = useStoreFandoms(
     (state) => state.rickAndMorty.activeStatus
@@ -45,13 +51,6 @@ export const Cam = () => {
     state.rickAndMorty.getPositionFromCurrentFilter()
   );
 
-  const { pos: prevPos, rotX: prevRotX } = useStoreFandoms((state) =>
-    state.rickAndMorty.getPositionFromPreviousFilter()
-  );
-
-  const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
-
-  // TODO : get current circle rotation AND radius, and let's go
   const zoom = pos.z;
 
   const scroll = useScroll();
@@ -60,14 +59,15 @@ export const Cam = () => {
   const rollRotation = useRef<Euler>(new Euler(0, 0, 0));
   const lookAtTarget = new Vector3(0, 0, 0); // Look-at target
 
-  useEffect(() => {
-    rollRotation.current.set(rotX, 0, 0);
-  }, [rotX]);
-
-  useFrame(({ clock }) => {
-    if (!refCam.current || !refBox.current) {
+  useFrame(() => {
+    if (!refCam.current) {
       return;
     }
+    const lerpedRotX = MathUtils.lerp(prevRotX.current, rotX, 0.05);
+
+    rollRotation.current.set(lerpedRotX, 0, 0);
+
+    prevRotX.current = lerpedRotX;
 
     t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 60);
 
@@ -79,7 +79,7 @@ export const Cam = () => {
     );
     lePos.applyMatrix4(rollRotationMatrix);
 
-    refCam.current.position.lerp(lePos, 0.5);
+    refCam.current.position.lerp(lePos, 0.1);
 
     const rollUpVector = new Vector3(0, 1, 0).applyMatrix4(rollRotationMatrix);
 
@@ -89,15 +89,12 @@ export const Cam = () => {
   });
 
   return (
-    <>
-      <PerspectiveCamera
-        ref={refCam}
-        fov={80}
-        far={100000}
-        near={0.1}
-        makeDefault
-      />
-      <Box ref={refBox} scale={10} material-color="white" />
-    </>
+    <PerspectiveCamera
+      ref={refCam}
+      fov={80}
+      far={100000}
+      near={0.1}
+      makeDefault
+    />
   );
 };

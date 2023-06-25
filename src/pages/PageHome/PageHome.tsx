@@ -1,10 +1,10 @@
 import { SceneGrid } from '@/components/Scene';
-import { OffscreenCanvasByStatus } from '@/components/Scene/OffscreenCanvas/OffscreenCanvasByStatus';
+import { OffscreenCanvasPreloaded } from '@/components/Scene/OffscreenCanvas/OffscreenCanvasPreloaded';
+import { Search } from '@/components/Search/Search';
+import { useStoreFandoms } from '@/stores/storeFandoms';
 import { Suspense } from 'react';
 import { PageHomeLayout } from './PageHomeLayout';
 import { pageHomeLoader } from './style.css';
-import { Search } from '@/components/Search/Search';
-import { useStoreFandoms } from '@/stores/storeFandoms';
 
 const Navigate = () => {
   const updateActiveStatus = useStoreFandoms(
@@ -43,7 +43,11 @@ export const PageHome = () => {
     <Suspense fallback={<div className={pageHomeLoader}>fetching...</div>}>
       <Navigate />
       <Search />
-      <OffscreenCanvasByStatus />
+      {/* Use offScreenCanvasByStatus if you want to load the images on demand */}
+      {/* <OffscreenCanvasByStatus /> */}
+      <OffscreenCanvasPreloaded status="Alive" size={4096} />
+      <OffscreenCanvasPreloaded status="Dead" size={4096} />
+      <OffscreenCanvasPreloaded status="unknown" size={4096} />
       <PageHomeLayout cards={<SceneGrid />} />
     </Suspense>
   );

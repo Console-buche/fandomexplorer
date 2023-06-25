@@ -1,7 +1,4 @@
-import {
-  useQueryGetCharacters,
-  useQueryGetCharactersFromFile,
-} from '@/services/getCharacters/useQueryGetCharacters';
+import { useQueryGetCharactersFromFile } from '@/services/getCharacters/useQueryGetCharacters';
 import { ScrollControls, Stars, useScroll } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import {
@@ -9,8 +6,6 @@ import {
   EffectComposer,
   ToneMapping,
 } from '@react-three/postprocessing';
-import { useEffect, useRef } from 'react';
-import { SpotLight, Vector3 } from 'three';
 import { Cam } from './Cam';
 import { Cockpit } from './Cockpit/Cockpit';
 import { RingGrid } from './Grid/RingGrid';
