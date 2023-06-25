@@ -34,7 +34,7 @@ const initialState: InitialState = {
   initialPosByStatus: {
     Alive: { pos: new Vector3(0, 0, 240), rotX: 0.05 },
     Dead: { pos: new Vector3(0, 0, 160), rotX: Math.PI / 3 },
-    unknown: { pos: new Vector3(0, 0, 60), rotX: Math.PI / -3 },
+    unknown: { pos: new Vector3(0, 0, 70), rotX: Math.PI / -3 },
   },
 };
 

@@ -3,6 +3,7 @@ import { ScreenSpace } from '@react-three/drei';
 import { Holodetails } from './Holodetails/Holodetails';
 import { Interior } from './Interior';
 import { Holocomputer } from './Holosearch';
+import { Holonavigation } from './Holonavigation';
 
 export const Cockpit = () => {
   const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
@@ -19,6 +20,7 @@ export const Cockpit = () => {
         position-y={1}
       />
       <Holocomputer />
+      <Holonavigation />
     </ScreenSpace>
   );
 };
