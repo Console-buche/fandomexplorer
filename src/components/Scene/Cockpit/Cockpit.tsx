@@ -15,12 +15,12 @@ export const Cockpit = () => {
       <Interior />
       <Holodetails
         character={activeCharacter}
-        scale={0.1}
-        position-x={-2.7}
-        position-y={1}
+        position-x={-15}
+        // rotation-y={0.2}
+        position-y={-1}
       />
       <Holocomputer />
-      <Holonavigation />
+      <Holonavigation position-x={-0.65} position-y={-0.2} />
     </ScreenSpace>
   );
 };

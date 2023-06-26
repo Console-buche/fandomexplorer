@@ -36,7 +36,7 @@ export const Holosearch = ({ isEditing }: Holosearch) => {
       font={Poppins}
       scale={0.06}
       position={[-0.15, 0.02, 0.1]}
-      color={placeholder ? 'gray' : 'white'}
+      color={placeholder ? 'lightgray' : 'white'}
       fontSize={0.6}
       textAlign="left"
       anchorX={0}

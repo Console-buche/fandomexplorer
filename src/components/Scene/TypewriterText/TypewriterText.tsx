@@ -8,6 +8,7 @@ interface TypewriterTextProps {
   typewrittenText: string | undefined;
   prefix?: string;
   delay?: number;
+  letterSpacing?: number;
   maxWidth?: number;
   position?: Vector3 | [number, number, number];
 }
@@ -15,6 +16,7 @@ interface TypewriterTextProps {
 export const TypewriterText = ({
   delay = 25,
   maxWidth,
+  letterSpacing = -0.025,
   typewrittenText = '',
   prefix = '',
   position = [0, 0, 0],
@@ -95,11 +97,12 @@ export const TypewriterText = ({
     <Text
       position={position}
       font={Poppins}
-      letterSpacing={-0.025}
+      letterSpacing={letterSpacing}
       textAlign="left"
       anchorX={0}
       anchorY={0}
       maxWidth={maxWidth}
+      fontSize={0.35}
       overflowWrap="break-word"
     >
       [{pref} {text}]
@@ -107,7 +110,7 @@ export const TypewriterText = ({
         toneMapped={false}
         emissive="#4B0082"
         emissiveIntensity={10}
-        opacity={text.length > 0 ? 1 : 0.05}
+        opacity={text.length > 0 ? 1 : 0.015}
         transparent
       />
     </Text>

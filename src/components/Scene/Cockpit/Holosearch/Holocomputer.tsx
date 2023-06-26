@@ -6,7 +6,7 @@ export const Holocomputer = () => {
 
   return (
     <mesh
-      position={[-1, -0.245, 0.1]}
+      position={[-0.9, -0.245, 0.1]}
       rotation-y={0.25}
       rotation-x={0.15}
       onPointerEnter={() => setIsEditing(true)}

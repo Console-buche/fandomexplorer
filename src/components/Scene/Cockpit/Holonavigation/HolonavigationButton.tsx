@@ -36,13 +36,12 @@ export const HolonavigationButton = ({
     <group {...props} onClick={handleOnClick}>
       <Text
         // position={position}
-        position-x={-0.3}
         color={activeStatus === status ? '#00ff00' : '#ffffff'}
-        fontSize={0.075}
+        fontSize={0.05}
         font={Poppins}
         letterSpacing={-0.025}
         textAlign="left"
-        anchorX={0}
+        anchorX={0.5}
       >
         {activeStatus === status ? `[${status}]` : status}
       </Text>
