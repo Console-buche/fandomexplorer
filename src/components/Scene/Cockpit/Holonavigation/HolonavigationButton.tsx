@@ -1,6 +1,7 @@
 import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
 import { useStoreCharacter } from '@/stores/storeCharacter';
 import { useStoreFandoms } from '@/stores/storeFandoms';
+import { useStoreSearch } from '@/stores/storeSearch';
 import Poppins from '@fonts/Poppins-Black.ttf';
 import { Text } from '@react-three/drei';
 import { GroupProps } from '@react-three/fiber';
@@ -16,6 +17,8 @@ export const HolonavigationButton = ({
   mat,
   ...props
 }: HolonavigationButton) => {
+  const countPerStatus = useStoreSearch((state) => state.countPerStatus);
+
   const updateActiveStatus = useStoreFandoms(
     (state) => state.rickAndMorty.updateActiveStatus
   );
@@ -35,7 +38,6 @@ export const HolonavigationButton = ({
   return (
     <group {...props} onClick={handleOnClick}>
       <Text
-        // position={position}
         color={activeStatus === status ? '#00ff00' : '#ffffff'}
         fontSize={0.05}
         font={Poppins}
@@ -43,7 +45,18 @@ export const HolonavigationButton = ({
         textAlign="left"
         anchorX={0.5}
       >
-        {activeStatus === status ? `[${status}]` : status}
+        {activeStatus === status ? `[${status}] ` : status}
+      </Text>
+      <Text
+        color={activeStatus === status ? '#00ff00' : '#ffffff'}
+        fontSize={0.033}
+        font={Poppins}
+        letterSpacing={-0.025}
+        textAlign="left"
+        anchorX={0.5}
+        position-y={-0.05}
+      >
+        {countPerStatus[status]}
       </Text>
     </group>
   );

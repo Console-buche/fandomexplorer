@@ -21,6 +21,7 @@ import {
   vertexShaderAtlas,
 } from '../OffscreenCanvas/offscreenCanvas.shader';
 import { useOffscreenCanvasStore } from '../OffscreenCanvas/offscreenCanvas.store';
+import { useStoreSearch } from '@/stores/storeSearch';
 
 type Grid = {
   characters: CharacterSchema[];
@@ -39,6 +40,9 @@ export const RingGrid = ({
   const scrollDirection = useScrollDirection();
   const activeStatus = useStoreFandoms(
     (state) => state.rickAndMorty.activeStatus
+  );
+  const updateCountPerStatus = useStoreSearch(
+    (state) => state.updateCountPerStatus
   );
   const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
   const { camera } = useThree();
@@ -63,6 +67,10 @@ export const RingGrid = ({
   const { size } = useThree();
 
   const groupLength = characters.filter((cc) => cc.status === status).length;
+
+  useEffect(() => {
+    updateCountPerStatus(status, groupLength);
+  }, [groupLength, status, updateCountPerStatus]);
 
   const uniforms = useMemo(
     () => ({
