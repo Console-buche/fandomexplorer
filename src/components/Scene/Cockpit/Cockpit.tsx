@@ -8,7 +8,7 @@ export const Cockpit = () => {
   return (
     <ScreenSpace depth={1}>
       <Interior />
-      <Holodetails position-x={-15} position-y={-1} />
+      <Holodetails position-x={-7} position-y={-1.5} />
       <Holocomputer />
       <Holonavigation position-x={-0.65} position-y={-0.2} />
     </ScreenSpace>

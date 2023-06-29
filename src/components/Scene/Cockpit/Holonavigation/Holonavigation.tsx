@@ -15,7 +15,7 @@ export const Holonavigation = (props: GroupProps) => {
         mat={holoNavigationMaterial}
       />
       <HolonavigationButton
-        position={[1.875, 0.95, 0]}
+        position={[1.845, 0.95, 0]}
         status="Dead"
         mat={holoNavigationMaterial}
       />

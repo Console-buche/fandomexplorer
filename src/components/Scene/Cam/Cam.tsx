@@ -53,8 +53,6 @@ export const Cam = () => {
 
     t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 60);
 
-    const lerpSpeed =
-      Math.abs(pos.z - refCam.current.position.z) > 1 ? 0.1 : 0.7;
     const lePos = getPositionOnCircle(zoom, t);
 
     // Rotate lePos by rollRotation
@@ -63,7 +61,7 @@ export const Cam = () => {
     );
     lePos.applyMatrix4(rollRotationMatrix);
 
-    refCam.current.position.lerp(lePos, 0.71);
+    refCam.current.position.lerp(lePos, scroll.delta > 0 ? 0.71 : 0.1);
 
     const rollUpVector = new Vector3(0, 1, 0).applyMatrix4(rollRotationMatrix);
 

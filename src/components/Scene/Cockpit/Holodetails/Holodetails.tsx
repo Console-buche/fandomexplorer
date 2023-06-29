@@ -26,34 +26,29 @@ export const Holodetails = (props: MeshProps) => {
   return (
     <mesh {...props}>
       <TypewriterText
-        typewrittenText={character?.status}
+        typewrittenText={`${character?.gender ? character.gender : ''}${type}`}
         position={[0, 7, -10]}
       />
-      <TypewriterText
+      {/* <TypewriterText
         typewrittenText={getHumanReadableDate(character?.created)}
         position={[0, 6.5, -10]}
-      />
+      /> */}
       <TypewriterText
         typewrittenText={character?.name}
-        position={[0, 6, -10]}
-      />
-
-      <TypewriterText
-        typewrittenText={`${character?.gender ? character.gender : ''}${type}`}
-        position={[0, 5, -10]}
+        position={[0, 6.5, -10]}
       />
 
       <TypewriterText
         typewrittenText={character?.origin.name}
-        position={[0, 4.5, -10]}
+        position={[0, 6, -10]}
       />
 
       <TypewriterText
         prefix="ep. "
-        maxWidth={10}
+        maxWidth={8}
         letterSpacing={0.0175}
         typewrittenText={getEpisode(character?.episode ?? [])}
-        position={[0, 4, -10]}
+        position={[0, 5, -10]}
       />
     </mesh>
   );

@@ -15,13 +15,7 @@ export const Search = () => {
   }, [inputSearchRef, setInputSearch]);
 
   useEffect(() => {
-    const timeOut = setTimeout(() => {
-      updateSearch(filter);
-    }, 1); // no debounce for no, see later is required
-
-    return () => {
-      clearTimeout(timeOut);
-    };
+    updateSearch(filter);
   }, [filter, updateSearch]);
 
   return (

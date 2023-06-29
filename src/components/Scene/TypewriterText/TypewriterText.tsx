@@ -110,7 +110,7 @@ export const TypewriterText = ({
         toneMapped={false}
         emissive="#4B0082"
         emissiveIntensity={10}
-        opacity={text.length > 0 ? 1 : 0.015}
+        opacity={text.length > 0 ? 1 : 0}
         transparent
       />
     </Text>

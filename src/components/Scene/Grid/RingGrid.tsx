@@ -22,6 +22,7 @@ import {
 } from '../OffscreenCanvas/offscreenCanvas.shader';
 import { useOffscreenCanvasStore } from '../OffscreenCanvas/offscreenCanvas.store';
 import { useStoreSearch } from '@/stores/storeSearch';
+import { filterCharacterByName } from '../Atom/utils';
 
 type Grid = {
   characters: CharacterSchema[];
@@ -41,6 +42,8 @@ export const RingGrid = ({
   const activeStatus = useStoreFandoms(
     (state) => state.rickAndMorty.activeStatus
   );
+  const currentSearch = useStoreSearch((state) => state.currentSearch);
+
   const updateCountPerStatus = useStoreSearch(
     (state) => state.updateCountPerStatus
   );
@@ -69,8 +72,13 @@ export const RingGrid = ({
   const groupLength = characters.filter((cc) => cc.status === status).length;
 
   useEffect(() => {
-    updateCountPerStatus(status, groupLength);
-  }, [groupLength, status, updateCountPerStatus]);
+    updateCountPerStatus(
+      status,
+      characters.filter(
+        (cc) => cc.status === status && filterCharacterByName(cc, currentSearch)
+      ).length
+    );
+  }, [groupLength, status, updateCountPerStatus, currentSearch, characters]);
 
   const uniforms = useMemo(
     () => ({
