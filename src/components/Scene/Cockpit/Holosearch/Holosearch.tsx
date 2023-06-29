@@ -1,6 +1,7 @@
 import { useStoreSearch } from '@/stores/storeSearch';
 import Poppins from '@fonts/Poppins-Black.ttf';
 import { Text } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 import { useEffect, useState } from 'react';
 
 type Holosearch = {
@@ -20,13 +21,11 @@ export const Holosearch = ({ isEditing }: Holosearch) => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (isEditing && inputSearch && inputSearch.current) {
+  useFrame(() => {
+    if (inputSearch && inputSearch.current) {
       inputSearch.current.focus();
-    } else {
-      inputSearch?.current?.blur();
     }
-  }, [isEditing, inputSearch]);
+  });
 
   const placeholder =
     currentSearch === '' && !isEditing ? 'Search character' : undefined;

@@ -1,10 +1,6 @@
-import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
-import { MeshProps } from '@react-three/fiber';
+import { useStoreCharacter } from '@/stores/storeCharacter';
 import { TypewriterText } from '../../TypewriterText';
-
-type Holodetails = {
-  character: CharacterSchema | undefined;
-} & MeshProps;
+import { MeshProps } from '@react-three/fiber';
 
 function getEpisode(episodes: string[]) {
   return episodes.map((episode) => episode.split('/').pop()).join(', ');
@@ -22,7 +18,9 @@ function getHumanReadableDate(date: string | undefined) {
   });
 }
 
-export const Holodetails = ({ character, ...props }: Holodetails) => {
+export const Holodetails = (props: MeshProps) => {
+  const character = useStoreCharacter((state) => state.activeCharacter);
+
   const type = character?.type ? ` - ${character?.type}` : '';
 
   return (
