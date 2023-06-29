@@ -6,20 +6,6 @@ import { useRef } from 'react';
 import { Euler, MathUtils, Matrix4, Vector3 } from 'three';
 import { getScrollDeltaFromDirection } from './utils';
 
-function getBezierPoint(
-  t: number,
-  p0: Vector3,
-  p1: Vector3,
-  p2: Vector3
-): Vector3 {
-  const oneMinusT = 1 - t;
-  return new Vector3(
-    oneMinusT * oneMinusT * p0.x + 2 * oneMinusT * t * p1.x + t * t * p2.x,
-    oneMinusT * oneMinusT * p0.y + 2 * oneMinusT * t * p1.y + t * t * p2.y,
-    oneMinusT * oneMinusT * p0.z + 2 * oneMinusT * t * p1.z + t * t * p2.z
-  );
-}
-
 function getPositionOnCircle(radius: number, angle: number): Vector3 {
   const position = new Vector3();
   const angleRadians = (angle * Math.PI + 100) / 180;
@@ -42,10 +28,6 @@ let t = 0;
 export const Cam = () => {
   const refCam = useRef<Camera>(null);
   const prevRotX = useRef<number>(0);
-
-  const activeStatus = useStoreFandoms(
-    (state) => state.rickAndMorty.activeStatus
-  );
 
   const { pos, rotX } = useStoreFandoms((state) =>
     state.rickAndMorty.getPositionFromCurrentFilter()
@@ -71,6 +53,8 @@ export const Cam = () => {
 
     t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 60);
 
+    const lerpSpeed =
+      Math.abs(pos.z - refCam.current.position.z) > 1 ? 0.1 : 0.7;
     const lePos = getPositionOnCircle(zoom, t);
 
     // Rotate lePos by rollRotation
@@ -79,7 +63,7 @@ export const Cam = () => {
     );
     lePos.applyMatrix4(rollRotationMatrix);
 
-    refCam.current.position.lerp(lePos, 0.1);
+    refCam.current.position.lerp(lePos, 0.71);
 
     const rollUpVector = new Vector3(0, 1, 0).applyMatrix4(rollRotationMatrix);
 

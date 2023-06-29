@@ -8,6 +8,7 @@ type Holosearch = {
   isEditing: boolean;
 };
 
+let t = 0;
 export const Holosearch = ({ isEditing }: Holosearch) => {
   const [blink, setBlink] = useState('');
   const currentSearch = useStoreSearch((state) => state.currentSearch);
@@ -22,7 +23,8 @@ export const Holosearch = ({ isEditing }: Holosearch) => {
   }, []);
 
   useFrame(() => {
-    if (inputSearch && inputSearch.current) {
+    t += 1;
+    if (inputSearch && inputSearch.current && t % 30 === 0 && t > 0) {
       inputSearch.current.focus();
     }
   });
