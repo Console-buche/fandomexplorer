@@ -3,8 +3,9 @@ import { useStoreCharacter } from '@/stores/storeCharacter';
 import { useStoreFandoms } from '@/stores/storeFandoms';
 import { useStoreSearch } from '@/stores/storeSearch';
 import Poppins from '@fonts/Poppins-Black.ttf';
-import { Text } from '@react-three/drei';
+import { Plane, Text, useTexture } from '@react-three/drei';
 import { GroupProps } from '@react-three/fiber';
+import { useMemo } from 'react';
 import { MeshStandardMaterial } from 'three';
 
 type HolonavigationButton = {
@@ -17,6 +18,8 @@ export const HolonavigationButton = ({
   mat,
   ...props
 }: HolonavigationButton) => {
+  const icon = useTexture(`assets/icon_${status.toLowerCase()}.png`);
+
   const countPerStatus = useStoreSearch((state) => state.countPerStatus);
 
   const updateActiveStatus = useStoreFandoms(
@@ -35,29 +38,51 @@ export const HolonavigationButton = ({
     updateActiveCharacter(undefined);
   }
 
+  const buttonMaterialActive = useMemo(
+    () =>
+      new MeshStandardMaterial({
+        emissive: 'purple',
+        emissiveIntensity: 2,
+        toneMapped: false,
+      }),
+    []
+  );
+
+  const isActive = activeStatus === status;
+
+  const buttonMaterial = useMemo(() => new MeshStandardMaterial(), []);
   return (
     <group {...props} onClick={handleOnClick}>
       <Text
-        color={activeStatus === status ? '#00ff00' : '#ffffff'}
+        color={isActive ? '#00ff00' : '#ffffff'}
+        fontSize={0.06}
+        font={Poppins}
+        letterSpacing={-0.025}
+        textAlign="left"
+        anchorX={0.5}
+        material={isActive ? buttonMaterialActive : buttonMaterial}
+      >
+        {status}
+      </Text>
+      <Text
+        color={isActive ? '#00ff00' : '#ffffff'}
         fontSize={0.05}
         font={Poppins}
         letterSpacing={-0.025}
         textAlign="left"
         anchorX={0.5}
-      >
-        {activeStatus === status ? `[${status}] ` : status}
-      </Text>
-      <Text
-        color={activeStatus === status ? '#00ff00' : '#ffffff'}
-        fontSize={0.033}
-        font={Poppins}
-        letterSpacing={-0.025}
-        textAlign="left"
-        anchorX={0.5}
         position-y={-0.05}
+        material={isActive ? buttonMaterialActive : buttonMaterial}
       >
         {countPerStatus[status]}
       </Text>
+      <Plane
+        args={[0.1, 0.1]}
+        position={[-0.56, -0.01, -0.01]}
+        material-map={icon}
+        material-transparent
+        material-alphaTest={0.5}
+      />
     </group>
   );
 };

@@ -10,12 +10,12 @@ export const Holonavigation = (props: GroupProps) => {
   return (
     <group {...props}>
       <HolonavigationButton
-        position={[1.6, 0.95, 0]} // TODO : position relative to Screen coordinates, so it adapts to screen res
+        position={[1.45, 0.95, 0]} // TODO : position relative to Screen coordinates, so it adapts to screen res
         status="Alive"
         mat={holoNavigationMaterial}
       />
       <HolonavigationButton
-        position={[1.95, 0.95, 0]}
+        position={[1.875, 0.95, 0]}
         status="Dead"
         mat={holoNavigationMaterial}
       />
