@@ -12,6 +12,7 @@ type InitialPosAndRotX = {
 };
 
 type InitialState = {
+  hasStarted: boolean;
   name: string;
   initialPos: Vector3;
   activeStatus: CharacterSchema['status'];
@@ -24,9 +25,11 @@ type Actions = {
   updateActiveStatus: (filterBy: CharacterSchema['status']) => void;
   getPositionFromCurrentFilter: () => InitialPosAndRotX;
   getPositionFromPreviousFilter: () => InitialPosAndRotX;
+  updateHasStarted: (hasStarted: boolean) => void;
 };
 
 const initialState: InitialState = {
+  hasStarted: false,
   name: 'LALALA JE SUIS LE STORE RICK AND MORTY',
   initialPos: new Vector3(0, 0, 240),
   previousStatus: 'Alive',
@@ -51,6 +54,16 @@ export const createFandomSliceRickAndMorty = (
         ...state.rickAndMorty,
         previousStatus: state.rickAndMorty.activeStatus,
         activeStatus: filterBy,
+      },
+    }));
+  },
+
+  updateHasStarted(hasStarted) {
+    set((state) => ({
+      ...state,
+      rickAndMorty: {
+        ...state.rickAndMorty,
+        hasStarted,
       },
     }));
   },

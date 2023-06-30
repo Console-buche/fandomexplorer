@@ -1,20 +1,14 @@
 import { useQueryGetCharactersFromFile } from '@/services/getCharacters/useQueryGetCharacters';
-import { ScrollControls, Stars, useScroll } from '@react-three/drei';
+import { ScrollControls, Stars } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import {
-  Bloom,
-  EffectComposer,
-  ToneMapping,
-} from '@react-three/postprocessing';
 import { Cam } from './Cam';
 import { Cockpit } from './Cockpit/Cockpit';
 import { RingGrid } from './Grid/RingGrid';
-import { Hemi } from './Lights/Hemi';
+import { Ambient } from './Lights';
+import { PostProcess } from './PostProcess';
 
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();
-
-  const scroll = useScroll();
 
   const { data } = characterData;
   if (!data) {
@@ -23,7 +17,7 @@ export const SceneGrid = () => {
 
   return (
     <Canvas gl={{ alpha: true, antialias: true }} dpr={[1, 2]}>
-      <Hemi />
+      <Ambient />
       <Stars depth={1000} />
 
       <ScrollControls infinite pages={3} damping={0}>
@@ -34,17 +28,7 @@ export const SceneGrid = () => {
         <RingGrid status="unknown" characters={data} rotX={Math.PI / -3} />
       </ScrollControls>
 
-      <EffectComposer disableNormalPass multisampling={4}>
-        <Bloom mipmapBlur luminanceThreshold={1} />
-        <ToneMapping
-          adaptive
-          resolution={256}
-          middleGrey={0.2}
-          maxLuminance={16.0}
-          averageLuminance={0.5}
-          adaptationRate={10}
-        />
-      </EffectComposer>
+      <PostProcess />
     </Canvas>
   );
 };

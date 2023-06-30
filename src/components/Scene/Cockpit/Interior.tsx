@@ -12,12 +12,17 @@ import {
   ShaderMaterial,
 } from 'three';
 import { fragmentShader, vertexShader } from '../shaders/snow.shader';
+import { useStoreFandoms } from '@/stores/storeFandoms';
 
 let t = 0;
 let tScrollRight = 0;
 let tScrollLeft = 0;
 export const Interior = () => {
   const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
+  const hasStarted = useStoreFandoms((state) => state.rickAndMorty.hasStarted);
+  const updateHasStarted = useStoreFandoms(
+    (state) => state.rickAndMorty.updateHasStarted
+  );
 
   const tex = useTexture('assets/cockpit_cut_no_layers_v4.png');
   const texLayerRibbon = useTexture('assets/cockpit_cut_layer_ribbon.png');
@@ -97,7 +102,8 @@ export const Interior = () => {
       !refButtons.current ||
       !refScreenBorder.current ||
       !refShaderMaterialScreen.current ||
-      !refShipCables.current
+      !refShipCables.current ||
+      !hasStarted
     ) {
       return;
     }
@@ -152,7 +158,7 @@ export const Interior = () => {
           toneMapped={false}
           emissive={0xffffff}
           emissiveMap={texLayerButtons}
-          emissiveIntensity={2}
+          emissiveIntensity={hasStarted ? 2 : 1}
         />
       </mesh>
 
@@ -181,7 +187,7 @@ export const Interior = () => {
           transparent
           toneMapped={false}
           emissiveMap={texLayerCables}
-          emissiveIntensity={60}
+          emissiveIntensity={hasStarted ? 60 : 1}
           emissive={0xffffff}
           side={DoubleSide}
           opacity={0.1}
@@ -198,7 +204,7 @@ export const Interior = () => {
           transparent
           toneMapped={false}
           emissiveMap={texLayerRibbon}
-          emissiveIntensity={60}
+          emissiveIntensity={hasStarted ? 60 : 1}
           emissive={0xffffff}
           side={DoubleSide}
           opacity={0.1}
@@ -215,7 +221,7 @@ export const Interior = () => {
           transparent
           toneMapped={false}
           emissiveMap={texLayerScreenBorder}
-          emissiveIntensity={5}
+          emissiveIntensity={hasStarted ? 5 : 1}
           emissive={0xffffff}
           side={DoubleSide}
           opacity={0.1}
@@ -232,13 +238,13 @@ export const Interior = () => {
           transparent
           toneMapped={false}
           emissiveMap={texLayerThreeScreensRight}
-          emissiveIntensity={2}
+          emissiveIntensity={hasStarted ? 2 : 1}
           emissive={0xffffff}
           side={DoubleSide}
         />
       </mesh>
 
-      <mesh>
+      <mesh onClick={() => updateHasStarted(true)}>
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
         <meshLambertMaterial
           map={texLayerThreeScreensCenter} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
@@ -247,7 +253,7 @@ export const Interior = () => {
           transparent
           toneMapped={false}
           emissiveMap={texLayerThreeScreensCenter}
-          emissiveIntensity={2}
+          emissiveIntensity={hasStarted ? 2 : 10000}
           emissive={0xffffff}
           side={DoubleSide}
         />
@@ -262,7 +268,7 @@ export const Interior = () => {
           transparent
           toneMapped={false}
           emissiveMap={texLayerThreeScreensLeft}
-          emissiveIntensity={2}
+          emissiveIntensity={hasStarted ? 2 : 1}
           emissive={0xffffff}
           side={DoubleSide}
         />
