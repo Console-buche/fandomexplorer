@@ -2,6 +2,7 @@ import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters
 import { useStoreCharacter } from '@/stores/storeCharacter';
 import { useStoreFandoms } from '@/stores/storeFandoms';
 import { useStoreSearch } from '@/stores/storeSearch';
+import { capitalizeFirstLetter } from '@/utils/strings';
 import Poppins from '@fonts/Poppins-Black.ttf';
 import { Plane, Text, useTexture } from '@react-three/drei';
 import { GroupProps } from '@react-three/fiber';
@@ -62,7 +63,7 @@ export const HolonavigationButton = ({
         anchorX={0.5}
         material={isActive ? buttonMaterialActive : buttonMaterial}
       >
-        {status}
+        {capitalizeFirstLetter(status)}
       </Text>
       <Text
         color={isActive ? '#00ff00' : '#ffffff'}

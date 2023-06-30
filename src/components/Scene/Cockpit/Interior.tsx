@@ -17,6 +17,9 @@ import { useStoreFandoms } from '@/stores/storeFandoms';
 let t = 0;
 let tScrollRight = 0;
 let tScrollLeft = 0;
+
+let intensityButtonsMultiplier = 0;
+
 export const Interior = () => {
   const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
   const hasStarted = useStoreFandoms((state) => state.rickAndMorty.hasStarted);
@@ -48,7 +51,6 @@ export const Interior = () => {
   const camera = three.camera as PerspectiveCamera;
   const ref = useRef<Mesh>(null);
 
-  const refThreeScreens = useRef<MeshLambertMaterial>(null);
   const refThreeScreensRight = useRef<MeshLambertMaterial>(null);
   const refThreeScreensCenter = useRef<MeshLambertMaterial>(null);
   const refThreeScreensLeft = useRef<MeshLambertMaterial>(null);
@@ -102,8 +104,7 @@ export const Interior = () => {
       !refButtons.current ||
       !refScreenBorder.current ||
       !refShaderMaterialScreen.current ||
-      !refShipCables.current ||
-      !hasStarted
+      !refShipCables.current
     ) {
       return;
     }
@@ -204,7 +205,7 @@ export const Interior = () => {
           transparent
           toneMapped={false}
           emissiveMap={texLayerRibbon}
-          emissiveIntensity={hasStarted ? 60 : 1}
+          emissiveIntensity={60}
           emissive={0xffffff}
           side={DoubleSide}
           opacity={0.1}
