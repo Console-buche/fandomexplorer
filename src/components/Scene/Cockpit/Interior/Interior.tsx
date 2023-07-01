@@ -183,7 +183,7 @@ export const Interior = () => {
         />
       </mesh>
 
-      <mesh position-z={-0.0001} position-y={-0.002}>
+      <mesh position-z={0.01} position-y={-0.002}>
         <planeBufferGeometry
           args={[size.widthAtDepth + 0.02, size.heightAtDepth + 0.01]}
         />
@@ -193,7 +193,7 @@ export const Interior = () => {
           transparent
           toneMapped={false}
           emissiveMap={texLayerRibbon}
-          emissiveIntensity={60}
+          emissiveIntensity={hasStarted ? 60 : 320}
           emissive={0xffffff}
           side={DoubleSide}
           opacity={0.1}

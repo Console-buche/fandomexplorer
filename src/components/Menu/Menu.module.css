@@ -1,0 +1,22 @@
+.menu {
+    position: absolute;
+    z-index: 1;
+    left:0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:10px;
+    margin:40px 20px;
+}
+
+.menu__item {
+    background: white;
+    padding: 10px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+}
+
+.menu__item:active, .menu__item_active {
+    background: #e0e0e0;
+    font-weight: bold;
+}

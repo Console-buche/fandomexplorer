@@ -4,6 +4,7 @@ import { useQueryClient } from './hooks/useQueryClient';
 import { AppRoutes } from './routes';
 import { innerLayoutStyle, layoutStyle } from './style/global.css';
 import './style/index.css';
+import { Menu } from './components/Menu';
 
 function App() {
   const queryClient = useQueryClient();
@@ -11,6 +12,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className={layoutStyle}>
+        <Menu />
+
         <div className={innerLayoutStyle}>
           <AppRoutes />
         </div>

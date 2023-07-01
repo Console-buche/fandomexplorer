@@ -1,25 +1,36 @@
 import Poppins from '@fonts/Poppins-Black.ttf';
 import { Text } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { MeshProps, useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ShaderMaterial, Vector3 } from 'three';
 
-interface TypewriterTextProps {
+type TypewriterTextProps = {
   typewrittenText: string | undefined;
+  textWrapper?: { head: string; tail: string };
   prefix?: string;
   delay?: number;
+  fontSize?: number;
   letterSpacing?: number;
   maxWidth?: number;
-  position?: Vector3 | [number, number, number];
-}
+  emissiveIntensity?: number;
+  emissive?: number;
+  outLine?: number;
+  fontFamily?: string;
+} & MeshProps;
 
 export const TypewriterText = ({
   delay = 25,
   maxWidth,
   letterSpacing = -0.025,
   typewrittenText = '',
+  fontSize = 0.35,
   prefix = '',
-  position = [0, 0, 0],
+  textWrapper = { head: '[', tail: ']' },
+  emissiveIntensity = 10,
+  outLine,
+  emissive = 0x4b0082,
+  fontFamily = Poppins,
+  ...meshProps
 }: TypewriterTextProps) => {
   const [text, setText] = useState('');
 
@@ -95,21 +106,23 @@ export const TypewriterText = ({
 
   return (
     <Text
-      position={position}
-      font={Poppins}
+      font={fontFamily}
       letterSpacing={letterSpacing}
       textAlign="left"
       anchorX={0}
       anchorY={0}
       maxWidth={maxWidth}
-      fontSize={0.35}
+      fontSize={fontSize}
       overflowWrap="break-word"
+      {...meshProps}
     >
-      [{pref} {text}]
+      {textWrapper.head}
+      {pref} {text}
+      {textWrapper.tail}
       <meshStandardMaterial
         toneMapped={false}
-        emissive="#4B0082"
-        emissiveIntensity={10}
+        emissive={emissive}
+        emissiveIntensity={emissiveIntensity}
         opacity={text.length > 0 ? 1 : 0}
         transparent
       />

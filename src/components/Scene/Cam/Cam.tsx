@@ -29,9 +29,10 @@ export const Cam = () => {
   const refCam = useRef<Camera>(null);
   const prevRotX = useRef<number>(0);
 
-  const { pos, rotX } = useStoreFandoms((state) =>
+  const { pos, rotX, lookAt } = useStoreFandoms((state) =>
     state.rickAndMorty.getPositionFromCurrentFilter()
   );
+  const prevLookAt = useRef<Vector3>(lookAt);
 
   const zoom = pos.z;
 
@@ -39,7 +40,6 @@ export const Cam = () => {
   const scrollDirection = useScrollDirection();
 
   const rollRotation = useRef<Euler>(new Euler(0, 0, 0));
-  const lookAtTarget = new Vector3(0, 0, 0); // Look-at target
 
   useFrame(() => {
     if (!refCam.current) {
@@ -67,7 +67,9 @@ export const Cam = () => {
 
     refCam.current.up.copy(rollUpVector);
 
-    refCam.current.lookAt(lookAtTarget);
+    const newLookAt = prevLookAt.current.lerp(lookAt, 0.075);
+    refCam.current.lookAt(newLookAt);
+    prevLookAt.current = newLookAt;
   });
 
   return (

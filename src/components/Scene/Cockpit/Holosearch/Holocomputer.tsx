@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Holosearch } from './Holosearch';
+import { MeshProps } from '@react-three/fiber';
 
-export const Holocomputer = () => {
+export const Holocomputer = (props: MeshProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
