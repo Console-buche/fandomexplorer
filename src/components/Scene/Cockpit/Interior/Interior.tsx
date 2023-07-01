@@ -1,5 +1,6 @@
 import useScrollDirection from '@/hooks/useScroll';
 import { useStoreCharacter } from '@/stores/storeCharacter';
+import { useStoreFandoms } from '@/stores/storeFandoms';
 import { Plane, useScroll, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
@@ -11,34 +12,23 @@ import {
   PerspectiveCamera,
   ShaderMaterial,
 } from 'three';
-import { fragmentShader, vertexShader } from '../shaders/snow.shader';
-import { useStoreFandoms } from '@/stores/storeFandoms';
+import { fragmentShader, vertexShader } from '../../shaders/snow.shader';
+import { InteriorStartup } from './InteriorStartup';
 
 let t = 0;
 let tScrollRight = 0;
 let tScrollLeft = 0;
 
-let intensityButtonsMultiplier = 0;
-
 export const Interior = () => {
   const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
   const hasStarted = useStoreFandoms((state) => state.rickAndMorty.hasStarted);
-  const updateHasStarted = useStoreFandoms(
-    (state) => state.rickAndMorty.updateHasStarted
-  );
 
   const tex = useTexture('assets/cockpit_cut_no_layers_v4.png');
   const texLayerRibbon = useTexture('assets/cockpit_cut_layer_ribbon.png');
   const texLayerCables = useTexture('assets/cockpit_cut_no_layer_cables.png');
   const texLayerButtons = useTexture('assets/cockpit_cut_layer_buttons_v3.png');
-  const texLayerThreeScreens = useTexture(
-    'assets/cockpit_cut_layer_screen_3_parts.png'
-  );
   const texLayerThreeScreensRight = useTexture(
     'assets/cockpit_cut_layer_screen_3_parts_right.png'
-  );
-  const texLayerThreeScreensCenter = useTexture(
-    'assets/cockpit_cut_layer_screen_3_parts_center.png'
   );
   const texLayerThreeScreensLeft = useTexture(
     'assets/cockpit_cut_layer_screen_3_parts_left.png'
@@ -52,7 +42,6 @@ export const Interior = () => {
   const ref = useRef<Mesh>(null);
 
   const refThreeScreensRight = useRef<MeshLambertMaterial>(null);
-  const refThreeScreensCenter = useRef<MeshLambertMaterial>(null);
   const refThreeScreensLeft = useRef<MeshLambertMaterial>(null);
   const refButtons = useRef<MeshLambertMaterial>(null);
   const refScreenBorder = useRef<MeshLambertMaterial>(null);
@@ -99,7 +88,6 @@ export const Interior = () => {
     if (
       // !refThreeScreens.current ||
       !refThreeScreensRight.current ||
-      !refThreeScreensCenter.current ||
       !refThreeScreensLeft.current ||
       !refButtons.current ||
       !refScreenBorder.current ||
@@ -245,20 +233,7 @@ export const Interior = () => {
         />
       </mesh>
 
-      <mesh onClick={() => updateHasStarted(true)}>
-        <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
-        <meshLambertMaterial
-          map={texLayerThreeScreensCenter} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
-          alphaTest={0.1}
-          ref={refThreeScreensCenter}
-          transparent
-          toneMapped={false}
-          emissiveMap={texLayerThreeScreensCenter}
-          emissiveIntensity={hasStarted ? 2 : 10000}
-          emissive={0xffffff}
-          side={DoubleSide}
-        />
-      </mesh>
+      <InteriorStartup width={size.widthAtDepth} height={size.heightAtDepth} />
 
       <mesh>
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
