@@ -1,7 +1,7 @@
 import { Material, Vector3 } from 'three';
 import { create } from 'zustand';
 
-export type PathName = '/' | '/about' | '/contact' | '/techstuff';
+export type PathName = '/' | '/about' | '/contact';
 
 type InitialState = {
   currentPath: PathName;

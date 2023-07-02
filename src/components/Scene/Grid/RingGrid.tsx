@@ -23,6 +23,7 @@ import {
 import { useOffscreenCanvasStore } from '../OffscreenCanvas/offscreenCanvas.store';
 import { useStoreSearch } from '@/stores/storeSearch';
 import { filterCharacterByName } from '../Atom/utils';
+import { useStoreNav } from '@/stores/storeNav';
 
 type Grid = {
   characters: CharacterSchema[];
@@ -70,6 +71,7 @@ export const RingGrid = ({
   const { size } = useThree();
 
   const groupLength = characters.filter((cc) => cc.status === status).length;
+  const currentPath = useStoreNav((state) => state.currentPath);
 
   useEffect(() => {
     updateCountPerStatus(
@@ -86,6 +88,7 @@ export const RingGrid = ({
       textureWidth: { value: 32 },
       textureHeight: { value: 32 },
       elementsCount: { value: groupLength },
+      uIsAnimatingIn: { value: true },
       animationProgress: { value: 0 },
       radius: { value: groupLength * 0.5 },
       camPosition: { value: camera.position.clone() },
@@ -105,6 +108,13 @@ export const RingGrid = ({
       ref.current.rotation.x = rotX;
     }
   }, [ref, rotX]);
+
+  useEffect(() => {
+    if (refShaderMat.current) {
+      refShaderMat.current.uniforms.uIsAnimatingIn.value =
+        currentPath === '/' ? 1 : 0;
+    }
+  }, [currentPath]);
 
   useFrame(() => {
     if (!refShaderMat.current || !ref.current) {
@@ -153,7 +163,7 @@ export const RingGrid = ({
         length: groupLength,
       },
       (_, i) => {
-        return Math.random() * 0.25 + 0.025;
+        return Math.random() * 0.5 + 0.1;
       }
     );
     const tIndex = new Float32Array(c);

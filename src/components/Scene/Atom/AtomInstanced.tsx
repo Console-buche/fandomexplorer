@@ -12,6 +12,7 @@ import {
   BufferGeometry,
   DoubleSide,
   InstancedBufferAttribute,
+  MathUtils,
   Matrix4,
   Mesh,
   Vector3,
@@ -19,6 +20,7 @@ import {
 import { positionOnCircleWithVariation } from '../AtomGroup/utils';
 import { calculateLookAt, filterCharacterByName } from './utils';
 import { useStoreFandoms } from '@/stores/storeFandoms';
+import { useStoreNav } from '@/stores/storeNav';
 
 type Atom = {
   isActive?: boolean;
@@ -71,6 +73,9 @@ export const AtomInstanced = ({
   const ref = useRef<Mesh>(null);
   const refBox = useRef<Mesh>(null);
   const refBoxGeometry = useRef<BufferGeometry>(null);
+
+  // TODO : take this logic to a more appropriate place
+  const currentPath = useStoreNav((state) => state.currentPath);
 
   const activeStatus = useStoreFandoms(
     (state) => state.rickAndMorty.activeStatus
@@ -160,11 +165,17 @@ export const AtomInstanced = ({
     time += 1;
 
     const animationProgress = refLeAnimationProgress.current.getX(tileIndex);
-    // animate in
-    refLeAnimationProgress.current?.setX(
-      tileIndex,
-      animationProgress + 0.1 ?? 0
+    const progressBasedOnCurrentPath =
+      currentPath === '/' ? animationProgress + 0.1 : animationProgress - 0.1;
+
+    const clampedProgress = MathUtils.clamp(
+      progressBasedOnCurrentPath,
+      0,
+      1 / refLesSpeeds.current.getX(tileIndex)
     );
+
+    // animate in
+    refLeAnimationProgress.current?.setX(tileIndex, clampedProgress ?? 0);
 
     if (refLeIsSelected.current) {
       refLeIsSelected.current.setX(tileIndex, isSelected ? 1 : 0);

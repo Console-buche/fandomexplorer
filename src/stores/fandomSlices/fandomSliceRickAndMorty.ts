@@ -3,7 +3,7 @@ import { Vector3 } from 'three';
 import { StoreApi } from 'zustand';
 import { useStoreNav } from '../storeNav';
 
-export type PathName = '/' | '/about' | '/contact' | '/techstuff';
+export type PathName = '/' | '/about' | '/contact';
 type Path = {
   position: Vector3;
   lookAt: Vector3;
@@ -58,7 +58,7 @@ const initialState: InitialState = {
       '/about',
       {
         position: new Vector3(0, 10, 240),
-        lookAt: new Vector3(100, 100, 0),
+        lookAt: new Vector3(0, 0, 0),
         path: '/about',
       },
     ],
@@ -66,16 +66,8 @@ const initialState: InitialState = {
       '/contact',
       {
         position: new Vector3(0, -10, 240),
-        lookAt: new Vector3(100, 100, 0),
+        lookAt: new Vector3(1000, 100, 1),
         path: '/contact',
-      },
-    ],
-    [
-      '/techstuff',
-      {
-        position: new Vector3(0, 0, 1000),
-        lookAt: new Vector3(100, 100, 0),
-        path: '/techstuff',
       },
     ],
   ]),

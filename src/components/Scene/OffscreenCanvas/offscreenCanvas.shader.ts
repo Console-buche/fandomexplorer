@@ -18,6 +18,7 @@ varying float vIsSelected;
 varying float vDepth;
 varying float vLeIsSearchTrue;
 varying float vLeIsShrinkAnimProgress;
+varying float vAlphaBasedOnDistance;
 
 attribute float animationProgress;
 
@@ -38,7 +39,7 @@ void main() {
 
   // Scale factor based on leIsSelected
 
-vec3 scale =  vec3(1., leIsShrinkAnimProgress, 1.);
+vec3 scale =  vec3(1., leIsShrinkAnimProgress , 1.);
 
   scale = leIsSelected == 1. && leIsSearchTrue == 1. ? mix(scale, vec3(1.25), leAnimDisplacement) : scale ; // Adjust the scaling factor as desired
 
@@ -89,6 +90,7 @@ lePos.y = mix(position.y, lePos.y , 1.-leIsShrinkAnimProgress);
   vDepth = glPosition.z;
 
   // Transform the vertex position by the model matrix
+vAlphaBasedOnDistance = distance(modelMatrix * vec4(lePos, 1.0), vec4(0., 0., 0., 1.));
   gl_Position = glPosition;
 }
 `;
@@ -101,12 +103,15 @@ uniform float textureHeight;
 uniform float uTime; // new uniform for time
 varying float vIsSelected;
 uniform vec3 camPosition;
+uniform float uIsAnimatingIn;
 
 varying float vLeIsSearchTrue;
 varying float vDepth;
 varying float vTileIndex;
 varying float vLeIsShrinkAnimProgress;
 varying vec2 vUv;
+varying float vAlphaBasedOnDistance;
+
 
 
 
@@ -194,9 +199,8 @@ void main() {
 
 
 
-
     float filteredOpacity = vLeIsSearchTrue > 0. ? 1. : .2;
-    gl_FragColor = vec4(toneMappedColor, max(0., min(1., depthOpacity * lateralOpacity)) * filteredOpacity  ) ;
+    gl_FragColor = vec4(toneMappedColor, max(0., min(1., depthOpacity * lateralOpacity)) * filteredOpacity    ) ;
 
 
 
@@ -215,7 +219,7 @@ void main() {
         // if (uv.x > 0.4 && uv.x < 0.6) {
         //     zapColor = vec3(0.701961, 0.047059, 0.890196);
         // }
-    gl_FragColor *= mix(1., sin(uTime  + vTileIndex * uv.x * 0.1  ) * .1 + 10., 1.-vLeIsShrinkAnimProgress);
+    gl_FragColor *= mix(1., sin(uTime  + vTileIndex * uv.x * 0.1  ) * .1 + 10., 1.-vLeIsShrinkAnimProgress );
     }
 
     // TODO HERE : implement a per image anim/shape, more natural/organic
@@ -223,5 +227,9 @@ void main() {
     // if ((sin(uTime + vTileIndex / 100. ) + 1.) / 2. < vUv.y && vIsSelected == 0. ) {
     //   discard;
    // }
+
+
+float normalizedAlpha = 1.-clamp(1.0 - vAlphaBasedOnDistance / 50., 0., 1.);
+gl_FragColor.a *= normalizedAlpha;
 }
 `;

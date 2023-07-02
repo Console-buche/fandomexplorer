@@ -17,6 +17,7 @@ void main() {
 export const asteroidRingFragmentShader = `
 uniform float uTime;
 uniform float uRadius;
+uniform float uAlpha;
 uniform int isStatusSelected;
 varying vec2 vUv;
 varying float d;
@@ -38,6 +39,6 @@ void main() {
     float distanceFromCenter = length(vUv - vec2(0.5)); 
     float opacity = smoothstep(0.8, 1.0, distanceFromCenter * 2.); 
 
-    gl_FragColor = vec4(color,   min(depthOpacity * opacity, 1.) *isActive);
+    gl_FragColor = vec4(color,   min(depthOpacity * opacity, 1.) *isActive * uAlpha);
 }
 `;

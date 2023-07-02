@@ -32,7 +32,7 @@ export const Cam = () => {
   const { pos, rotX, lookAt } = useStoreFandoms((state) =>
     state.rickAndMorty.getPositionFromCurrentFilter()
   );
-  const prevLookAt = useRef<Vector3>(lookAt);
+  const prevLookAt = useRef<Vector3>(new Vector3(0, 0, 0));
 
   const zoom = pos.z;
 
@@ -67,8 +67,9 @@ export const Cam = () => {
 
     refCam.current.up.copy(rollUpVector);
 
-    const newLookAt = prevLookAt.current.lerp(lookAt, 0.075);
+    const newLookAt = prevLookAt.current.clone().lerp(lookAt, 0.1);
     refCam.current.lookAt(newLookAt);
+
     prevLookAt.current = newLookAt;
   });
 

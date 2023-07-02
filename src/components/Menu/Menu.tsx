@@ -57,13 +57,6 @@ export const Menu = () => {
       <NavLinkWithActiveStyle
         className={Style.menu__item}
         activeClassName={Style.menu__item_active}
-        to="/techstuff"
-      >
-        Note from the dev - tech stuff
-      </NavLinkWithActiveStyle>
-      <NavLinkWithActiveStyle
-        className={Style.menu__item}
-        activeClassName={Style.menu__item_active}
         to="/contact"
       >
         Contact
