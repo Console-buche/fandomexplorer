@@ -229,7 +229,17 @@ void main() {
    // }
 
 
-float normalizedAlpha = 1.-clamp(1.0 - vAlphaBasedOnDistance / 50., 0., 1.);
+// Define the maximum distance that will affect the opacity.
+float maxDistance = 50.0;
+
+// Make sure vAlphaBasedOnDistance doesn't exceed the maxDistance.
+float clampedDistance = min(vAlphaBasedOnDistance, maxDistance);
+
+// Calculate the normalized alpha. Elements beyond maxDistance will have alpha = 1.
+float normalizedAlpha = clampedDistance / maxDistance;
+
+// Use the normalized alpha to adjust the fragment's opacity.
 gl_FragColor.a *= normalizedAlpha;
+
 }
 `;

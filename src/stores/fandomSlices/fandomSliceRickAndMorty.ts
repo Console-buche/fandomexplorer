@@ -8,6 +8,7 @@ type Path = {
   position: Vector3;
   lookAt: Vector3;
   path: string;
+  rotX?: number;
 };
 
 type Paths = Map<PathName, Path>;
@@ -57,8 +58,9 @@ const initialState: InitialState = {
     [
       '/about',
       {
-        position: new Vector3(0, 10, 240),
-        lookAt: new Vector3(0, 0, 0),
+        position: new Vector3(-50, -100, 200),
+        lookAt: new Vector3(-500, 0, 0),
+        rotX: 0.95,
         path: '/about',
       },
     ],
@@ -125,7 +127,7 @@ export const createFandomSliceRickAndMorty = (
       return {
         pos: path.position,
         lookAt: path.lookAt,
-        rotX: 0,
+        rotX: path.rotX ?? 0,
       };
     }
     return get().rickAndMorty.initialPosByStatus[
