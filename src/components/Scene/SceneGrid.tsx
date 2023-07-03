@@ -16,7 +16,13 @@ export const SceneGrid = () => {
   }
 
   return (
-    <Canvas gl={{ alpha: true, antialias: true }} dpr={[1, 2]}>
+    <Canvas
+      gl={{
+        alpha: true,
+        antialias: true,
+      }}
+      dpr={[1, 2]}
+    >
       <Ambient />
       <Stars depth={1000} />
 
