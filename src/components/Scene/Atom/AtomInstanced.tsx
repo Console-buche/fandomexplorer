@@ -17,7 +17,10 @@ import {
   Mesh,
   Vector3,
 } from 'three';
-import { positionOnCircleWithVariation } from '../AtomGroup/utils';
+import {
+  positionAlongVerticesSet,
+  positionOnCircleWithVariation,
+} from '../AtomGroup/utils';
 import { calculateLookAt, filterCharacterByName } from './utils';
 import { useStoreFandoms } from '@/stores/storeFandoms';
 import { useStoreNav } from '@/stores/storeNav';
@@ -74,6 +77,8 @@ export const AtomInstanced = ({
   const refBox = useRef<Mesh>(null);
   const refBoxGeometry = useRef<BufferGeometry>(null);
 
+  const positions404 = useStoreNav((state) => state.positions404);
+
   // TODO : take this logic to a more appropriate place
   const currentPath = useStoreNav((state) => state.currentPath);
 
@@ -120,6 +125,17 @@ export const AtomInstanced = ({
       refLeIsSearchTrue.current.needsUpdate = true;
     }
   }, [refLeIsSearchTrue, currentSearch, character, tileIndex]);
+
+  // TODO : here 404
+  const posOn404 = useCallback(
+    () =>
+      positionAlongVerticesSet(
+        positions404[character.status],
+        groupLength,
+        tileIndex
+      ),
+    [positions404, groupLength, tileIndex, character]
+  );
 
   const pos = useCallback(
     (displacementFactor = 0) =>
@@ -176,13 +192,13 @@ export const AtomInstanced = ({
 
     // animate in
     refLeAnimationProgress.current?.setX(tileIndex, clampedProgress ?? 0);
-
+    const circleOr404 = currentPath === '/' ? pos : posOn404;
     if (refLeIsSelected.current) {
       refLeIsSelected.current.setX(tileIndex, isSelected ? 1 : 0);
     }
     refLeIsSelected.current.needsUpdate = true;
 
-    refLePos.current.setXYZ(tileIndex, ...pos());
+    refLePos.current.setXYZ(tileIndex, ...circleOr404());
 
     if (refBox.current) {
       const [x, y, z] = pos();

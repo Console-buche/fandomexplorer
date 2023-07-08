@@ -114,7 +114,7 @@ export const HolonavigationButton = ({
       refShaderMat.current.uniforms.uTime.value < 0.07
     ) {
       refShaderMat.current.uniforms.uTime.value = MathUtils.clamp(
-        refShaderMat.current.uniforms.uTime.value + 0.01 + index * 0.01,
+        refShaderMat.current.uniforms.uTime.value + 0.007 + index * 0.001,
         0,
         0.07
       );
@@ -123,7 +123,7 @@ export const HolonavigationButton = ({
 
     if (currentPath !== '/' && refShaderMat.current.uniforms.uTime.value > 0) {
       refShaderMat.current.uniforms.uTime.value = MathUtils.clamp(
-        refShaderMat.current.uniforms.uTime.value - 0.01 - index * 0.01,
+        refShaderMat.current.uniforms.uTime.value - 0.007 - index * 0.001,
         0,
         0.07
       );

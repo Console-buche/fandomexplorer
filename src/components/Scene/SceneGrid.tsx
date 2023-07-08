@@ -6,6 +6,7 @@ import { Cockpit } from './Cockpit/Cockpit';
 import { RingGrid } from './Grid/RingGrid';
 import { Ambient } from './Lights';
 import { PostProcess } from './PostProcess';
+import { Page404 } from '@/pages/404/Page404';
 
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();
@@ -25,6 +26,8 @@ export const SceneGrid = () => {
     >
       <Ambient />
       <Stars depth={1000} />
+
+      <Page404 />
 
       <ScrollControls infinite pages={3} damping={0}>
         <Cam />

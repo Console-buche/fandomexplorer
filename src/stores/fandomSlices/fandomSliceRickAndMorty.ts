@@ -58,17 +58,16 @@ const initialState: InitialState = {
     [
       '/about',
       {
-        position: new Vector3(-50, -100, 200),
-        lookAt: new Vector3(-500, 0, 0),
-        rotX: 0.95,
+        position: new Vector3(0, 0, 240),
+        lookAt: new Vector3(0, 0, 0),
         path: '/about',
       },
     ],
     [
       '/contact',
       {
-        position: new Vector3(0, -10, 240),
-        lookAt: new Vector3(1000, 100, 1),
+        position: new Vector3(0, 0, 240),
+        lookAt: new Vector3(0, 0, 0),
         path: '/contact',
       },
     ],
@@ -76,7 +75,7 @@ const initialState: InitialState = {
   initialPosByStatus: {
     Alive: {
       pos: new Vector3(0, 0, 240),
-      rotX: 0.05,
+      rotX: 0.0,
       lookAt: new Vector3(0, 0, 0),
     },
     Dead: {

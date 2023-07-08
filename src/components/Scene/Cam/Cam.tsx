@@ -32,7 +32,7 @@ export const Cam = () => {
   const { pos, rotX, lookAt } = useStoreFandoms((state) =>
     state.rickAndMorty.getPositionFromCurrentFilter()
   );
-  const prevLookAt = useRef<Vector3>(new Vector3(0, 0, 0));
+  const prevLookAt = useRef<Vector3>(lookAt);
 
   const zoom = pos.z;
 

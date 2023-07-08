@@ -30,6 +30,9 @@ export const Holocomputer = (props: MeshProps) => {
   const opacity = isEditing ? 1 : currentPath !== '/' ? 0.3 : 0.1;
   const emissiveIntensity = isEditing ? 20 : currentPath !== '/' ? 20 : 0;
 
+  // const opacity = isEditing ? 1 : 0.1;
+  // const emissiveIntensity = isEditing ? 20 : 0;
+
   return (
     <mesh
       position={[-0.9, -0.245, 0.1]}
@@ -40,10 +43,11 @@ export const Holocomputer = (props: MeshProps) => {
     >
       <planeBufferGeometry args={[0.5, 0.2]} />
       <meshLambertMaterial
+        color="purple"
         ref={refMat}
         toneMapped={false}
         emissive="purple"
-        map={tex}
+        // map={tex}
         transparent
         opacity={opacity}
         // depthWrite={false}
