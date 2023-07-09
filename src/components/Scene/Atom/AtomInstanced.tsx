@@ -1,12 +1,10 @@
 import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
 import { useStoreCharacter } from '@/stores/storeCharacter';
+import { useStoreFandoms } from '@/stores/storeFandoms';
+import { useStoreNav } from '@/stores/storeNav';
 import { useStoreSearch } from '@/stores/storeSearch';
-import { Box, Instance, Plane } from '@react-three/drei';
-import {
-  GroupProps,
-  PlaneBufferGeometryProps,
-  useFrame,
-} from '@react-three/fiber';
+import { Instance } from '@react-three/drei';
+import { GroupProps, useFrame } from '@react-three/fiber';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   BufferGeometry,
@@ -21,9 +19,7 @@ import {
   positionAlongVerticesSet,
   positionOnCircleWithVariation,
 } from '../AtomGroup/utils';
-import { calculateLookAt, filterCharacterByName } from './utils';
-import { useStoreFandoms } from '@/stores/storeFandoms';
-import { useStoreNav } from '@/stores/storeNav';
+import { filterCharacterByName } from './utils';
 
 type Atom = {
   isActive?: boolean;
@@ -76,6 +72,7 @@ export const AtomInstanced = ({
   const ref = useRef<Mesh>(null);
   const refBox = useRef<Mesh>(null);
   const refBoxGeometry = useRef<BufferGeometry>(null);
+  const prevPos = useRef<[number, number, number]>();
 
   const positions404 = useStoreNav((state) => state.positions404);
 
@@ -198,7 +195,12 @@ export const AtomInstanced = ({
     }
     refLeIsSelected.current.needsUpdate = true;
 
-    refLePos.current.setXYZ(tileIndex, ...circleOr404());
+    const targetPosAsVec3 = new Vector3(...circleOr404());
+    const prevPosAsVec3 = new Vector3(...(prevPos.current ?? [0, 0, 0]));
+    const lerpedPos = prevPosAsVec3.lerp(targetPosAsVec3, 0.1);
+
+    refLePos.current.setXYZ(tileIndex, ...lerpedPos.toArray());
+    prevPos.current = lerpedPos.toArray();
 
     if (refBox.current) {
       const [x, y, z] = pos();
