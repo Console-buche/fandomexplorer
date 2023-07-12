@@ -151,16 +151,6 @@ export const AtomInstanced = ({
     [groupLength, refLeAnimationProgress, refLesSpeeds, tileIndex]
   );
 
-  useEffect(() => {
-    if (refBox.current) {
-      const [x, y, z] = pos();
-      refBox.current.lookAt(new Vector3(x, y, z));
-      // if (refBox.current) {
-      //   refBox.current.rotateX(Math.PI * 0.5);
-      // }
-    }
-  }, [pos]);
-
   // TODO : don't have to check every frame here ?
   useFrame(({ camera, gl }) => {
     if (
@@ -202,10 +192,12 @@ export const AtomInstanced = ({
     refLePos.current.setXYZ(tileIndex, ...lerpedPos.toArray());
     prevPos.current = lerpedPos.toArray();
 
+    // TODO : possible optimization here, do not call on every frame
     if (refBox.current) {
       const [x, y, z] = pos();
       const lookAt = new Vector3().copy(new Vector3(x, y, z)).normalize();
       refBox.current.lookAt(lookAt);
+      refBox.current.position.set(x, y, z);
     }
 
     // SEARCH TRUE ANIM
@@ -248,6 +240,7 @@ export const AtomInstanced = ({
     if (activeStatus !== character.status) {
       return;
     }
+
     setIsSelected(true);
     // updateActiveCharacter(character);
   };
@@ -267,14 +260,12 @@ export const AtomInstanced = ({
         onPointerEnter={handleOnPointerEnter} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
         onPointerLeave={handleOnPointerLeave} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
         ref={refBox}
-        position={pos()} // todo : this isn't shader based and needs updating in a rerender. Trigger rerender when animation is done. And this makes sense, cause you don't want to interact while animating
       >
-        <planeBufferGeometry args={[3, 3]} ref={refBoxGeometry} />
+        <circleBufferGeometry args={[1.5, 12, 12]} ref={refBoxGeometry} />
         <meshBasicMaterial
           side={DoubleSide}
           transparent
           opacity={0}
-          depthWrite={false}
           toneMapped
         />
       </mesh>
