@@ -9,6 +9,7 @@ import { useFrame } from '@react-three/fiber';
 import { useStoreFandoms } from '@/stores/storeFandoms';
 import { useStoreNav } from '@/stores/storeNav';
 import { shallow } from 'zustand/shallow';
+import useScrollDirection from '@/hooks/useScroll';
 
 // TODO : fine tune oscillation to something realistic and niec
 // move camera just a bit towards the lookAt dir when transitionning, to give impression of looking around in cockpit but don't look cockpit itself
@@ -28,6 +29,7 @@ function createDecayingOscillator(dampingFactor = 0.06): Oscillator {
 
 export const Cockpit = () => {
   const refGroup = useRef<Group>(null);
+  const scrollDirection = useScrollDirection();
 
   const { currentPath, previousPath } = useStoreNav(
     (state) => ({
@@ -48,22 +50,45 @@ export const Cockpit = () => {
   }, [currentPath, previousPath]);
 
   useFrame(({ clock }) => {
-    if (refGroup.current) {
-      refGroup.current.position.y = MathUtils.lerp(
-        refGroup.current.position.y,
-        -MathUtils.clamp(lookAt.y, -1, 1),
-        0.1
-      );
+    if (!refGroup.current) {
+      return;
     }
+
+    // refGroup.current.position.y = MathUtils.lerp(
+    //   refGroup.current.position.y,
+    //   -MathUtils.clamp(lookAt.y, -1, 1),
+    //   0.1
+    // );
 
     t += 0.96;
     if (Math.abs(m(t)) > 0.001) {
       refGroup.current.position.y = MathUtils.lerp(
         refGroup.current?.position.y,
-        m(t) * 0.25,
+        m(t) * 0.25 - 0.025,
         0.1
       );
-      console.log(m(t));
+    }
+
+    // Tilt full interior based on scroll direction
+    // rotate based on scroll direction
+    if (scrollDirection > 0) {
+      refGroup.current.rotation.z = MathUtils.lerp(
+        refGroup.current.rotation.z,
+        0.02,
+        0.05
+      );
+    } else if (scrollDirection < 0) {
+      refGroup.current.rotation.z = MathUtils.lerp(
+        refGroup.current.rotation.z,
+        -0.02,
+        0.05
+      );
+    } else {
+      refGroup.current.rotation.z = MathUtils.lerp(
+        refGroup.current.rotation.z,
+        0,
+        0.025
+      );
     }
   });
 

@@ -7,6 +7,8 @@ import { RingGrid } from './Grid/RingGrid';
 import { Ambient } from './Lights';
 import { PostProcess } from './PostProcess';
 import { Page404 } from '@/pages/404/Page404';
+import { Star } from './Stars/Star.mesh';
+import { Planets } from './Stars/Stars';
 
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();
@@ -26,6 +28,13 @@ export const SceneGrid = () => {
     >
       <Ambient />
       <Stars depth={1000} />
+
+      <directionalLight intensity={2} castShadow />
+
+      <Planets />
+      {/* <Star position={[0, 30, 0]} />
+      <Star position={[12, 30, 0]} />
+      <Star position={[-12, 30, 0]} /> */}
 
       <Page404 />
 

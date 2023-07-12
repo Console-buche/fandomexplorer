@@ -75,7 +75,7 @@ const initialState: InitialState = {
   initialPosByStatus: {
     Alive: {
       pos: new Vector3(0, 0, 240),
-      rotX: 0.0,
+      rotX: 0.05,
       lookAt: new Vector3(0, 0, 0),
     },
     Dead: {
