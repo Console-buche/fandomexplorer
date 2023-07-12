@@ -1,12 +1,16 @@
 import { useStoreFandoms } from '@/stores/storeFandoms';
 import { easeOutCubic } from '@/utils/easings';
+import { Box } from '@react-three/drei';
 import {
   Bloom,
   EffectComposer,
+  Glitch,
+  Selection,
   ToneMapping,
 } from '@react-three/postprocessing';
 import { useEffect, useState } from 'react';
 import { MathUtils } from 'three';
+import { SelectionBox } from 'three-stdlib';
 
 export const PostProcess = () => {
   const [factor, setFactor] = useState(0);

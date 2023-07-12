@@ -264,6 +264,7 @@ export const AtomInstanced = ({
         <circleBufferGeometry args={[1.5, 12, 12]} ref={refBoxGeometry} />
         <meshBasicMaterial
           side={DoubleSide}
+          depthWrite={false}
           transparent
           opacity={0}
           toneMapped
