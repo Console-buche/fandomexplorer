@@ -2,7 +2,7 @@ import Poppins from '@fonts/Poppins-Black.ttf';
 import { Text } from '@react-three/drei';
 import { MeshProps, useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ShaderMaterial, Vector3 } from 'three';
+import { MeshStandardMaterial, ShaderMaterial, Vector3 } from 'three';
 
 type TypewriterTextProps = {
   typewrittenText: string | undefined;
@@ -13,9 +13,9 @@ type TypewriterTextProps = {
   letterSpacing?: number;
   maxWidth?: number;
   emissiveIntensity?: number;
-  emissive?: number;
   outLine?: number;
   fontFamily?: string;
+  textMaterial: MeshStandardMaterial;
 } & MeshProps;
 
 export const TypewriterText = ({
@@ -23,13 +23,13 @@ export const TypewriterText = ({
   maxWidth,
   letterSpacing = -0.025,
   typewrittenText = '',
-  fontSize = 0.35,
+  fontSize = 0.4,
   prefix = '',
   textWrapper = { head: '[', tail: ']' },
   emissiveIntensity = 10,
   outLine,
-  emissive = 0x4b0082,
   fontFamily = Poppins,
+  textMaterial,
   ...meshProps
 }: TypewriterTextProps) => {
   const [text, setText] = useState('');
@@ -37,18 +37,6 @@ export const TypewriterText = ({
   const refShader = useRef<ShaderMaterial>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastWord = useRef<string | undefined>(undefined);
-
-  const uniforms = useMemo(
-    () => ({
-      uTime: {
-        value: 0,
-      },
-      color: {
-        value: new Vector3(1, 0, 1),
-      },
-    }),
-    []
-  );
 
   useFrame(() => {
     if (!refShader.current) {
@@ -114,18 +102,14 @@ export const TypewriterText = ({
       maxWidth={maxWidth}
       fontSize={fontSize}
       overflowWrap="break-word"
+      material-emissiveIntensity={emissiveIntensity}
+      material-opacity={text.length > 0 ? 1 : 0}
+      material={textMaterial}
       {...meshProps}
     >
       {textWrapper.head}
       {pref} {text}
       {textWrapper.tail}
-      <meshStandardMaterial
-        toneMapped={false}
-        emissive={emissive}
-        emissiveIntensity={emissiveIntensity}
-        opacity={text.length > 0 ? 1 : 0}
-        transparent
-      />
     </Text>
   );
 };

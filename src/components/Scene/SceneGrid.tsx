@@ -2,17 +2,18 @@ import { Page404 } from '@/pages/404/Page404';
 import { useQueryGetCharactersFromFile } from '@/services/getCharacters/useQueryGetCharacters';
 import { ScrollControls, Stars, Stats, Trail } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
+import { Mesh } from 'three';
 import { Cam } from './Cam';
 import { Cockpit } from './Cockpit/Cockpit';
 import { RingGrid } from './Grid/RingGrid';
 import { Ambient } from './Lights';
 import { PostProcess } from './PostProcess';
 import { Planets } from './Stars/Stars';
-import { Mesh, Object3D } from 'three';
-import { useRef } from 'react';
 
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();
+
 
   const { data } = characterData;
   if (!data) {
@@ -29,16 +30,16 @@ export const SceneGrid = () => {
     >
       <Ambient />
       <Stars depth={1000} />
-
-      <directionalLight intensity={2} castShadow />
+      <directionalLight intensity={3} />
 
       <Planets />
+
       {/* <Star position={[0, 30, 0]} />
       <Star position={[12, 30, 0]} />
       <Star position={[-12, 30, 0]} /> */}
 
       <Page404 />
-
+      {/**/}
       <ScrollControls infinite pages={3} damping={0}>
         <Cam />
         <Cockpit />
@@ -46,8 +47,8 @@ export const SceneGrid = () => {
         <RingGrid status="Dead" characters={data} rotX={Math.PI / 3} />
         <RingGrid status="unknown" characters={data} rotX={Math.PI / -3} />
       </ScrollControls>
-      <Stats />
-      <TrailDebris />
+      {/* <Stats /> */}
+      {/* <TrailDebris /> */}
       <PostProcess />
     </Canvas>
   );
@@ -68,6 +69,7 @@ function TrailDebris() {
     ref.current.position.x = Math.sin(0.005 * Date.now()) * 50;
     ref.current.position.y = Math.sin(0.01 * Date.now()) * 10;
   });
+
   return (
     <Trail
       width={10} // Width of the line

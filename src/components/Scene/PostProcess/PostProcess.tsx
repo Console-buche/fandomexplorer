@@ -1,20 +1,26 @@
 import { useStoreFandoms } from '@/stores/storeFandoms';
+import { useStoreNav } from '@/stores/storeNav';
 import { easeOutCubic } from '@/utils/easings';
-import { Box } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 import {
   Bloom,
   EffectComposer,
-  Glitch,
-  Selection,
   ToneMapping,
 } from '@react-three/postprocessing';
-import { useEffect, useState } from 'react';
+import { ToneMappingEffect } from 'postprocessing';
+import { useEffect, useRef, useState } from 'react';
 import { MathUtils } from 'three';
-import { SelectionBox } from 'three-stdlib';
+
+type ToneMappingEffectOptions = ConstructorParameters<
+  typeof ToneMappingEffect
+>[0];
 
 export const PostProcess = () => {
   const [factor, setFactor] = useState(0);
+  const refTone = useRef<ToneMappingEffectOptions>(null);
+  const currentPath = useStoreNav((state) => state.currentPath);
   const hasStarted = useStoreFandoms((state) => state.rickAndMorty.hasStarted);
+  const isPath404 = currentPath !== '/' && currentPath !== '/about';
 
   useEffect(() => {
     if (!hasStarted) return;
@@ -31,10 +37,31 @@ export const PostProcess = () => {
     return () => clearInterval(intervalId);
   }, [hasStarted]);
 
+  // useFrame(() => {
+  //   if (!refTone.current) return;
+  //   if (isPath404) {
+  //     refTone.current.minLuminance =
+  //       2 - MathUtils.lerp(refTone.current.minLuminance ?? 0, 0, 0.001);
+  //   }
+
+  //   if (hasStarted && !isPath404) {
+  //     refTone.current.minLuminance =
+  //       2 - MathUtils.lerp(refTone.current.minLuminance ?? 0, 2, 0.001);
+
+  //     refTone.current.middleGrey = MathUtils.lerp(
+  //       refTone.current.middleGrey ?? 0,
+  //       0.2,
+  //       0.0001
+  //     );
+  //   }
+  // });
+
   return (
     <EffectComposer disableNormalPass multisampling={4}>
       <Bloom mipmapBlur luminanceThreshold={1} />
       <ToneMapping
+        // @ts-ignore
+        ref={refTone}
         adaptive
         resolution={256}
         middleGrey={MathUtils.clamp(0.2 * factor, 0.0001, 0.2)}

@@ -13,6 +13,7 @@ import {
   MathUtils,
   Matrix4,
   Mesh,
+  MeshBasicMaterial,
   Vector3,
 } from 'three';
 import {
@@ -35,6 +36,7 @@ type Atom = {
   refLeIsShrinkAnimProgress: React.RefObject<InstancedBufferAttribute>;
   refLeAnimDisplacement: React.RefObject<InstancedBufferAttribute>;
   refLeIsSelected: React.RefObject<InstancedBufferAttribute>;
+  materialAtomRaycast: MeshBasicMaterial;
 } & GroupProps;
 
 function computeLookAtRotationMatrix(
@@ -63,6 +65,7 @@ export const AtomInstanced = ({
   refLeAnimationProgress,
   refLeIsShrinkAnimProgress,
   refLeAnimDisplacement,
+  materialAtomRaycast,
   refLeIsSearchTrue,
   refLesSpeeds,
   refLeTime,
@@ -192,8 +195,7 @@ export const AtomInstanced = ({
     refLePos.current.setXYZ(tileIndex, ...lerpedPos.toArray());
     prevPos.current = lerpedPos.toArray();
 
-    // TODO : possible optimization here, do not call on every frame
-    if (refBox.current) {
+    if (refBox.current && character.status === activeStatus) {
       const [x, y, z] = pos();
       const lookAt = new Vector3().copy(new Vector3(x, y, z)).normalize();
       refBox.current.lookAt(lookAt);
@@ -256,20 +258,23 @@ export const AtomInstanced = ({
 
   return (
     <>
-      <mesh
-        onPointerEnter={handleOnPointerEnter} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
-        onPointerLeave={handleOnPointerLeave} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
-        ref={refBox}
-      >
-        <circleBufferGeometry args={[1.5, 12, 12]} ref={refBoxGeometry} />
-        <meshBasicMaterial
+      {character.status === activeStatus && (
+        <mesh
+          onPointerEnter={handleOnPointerEnter} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
+          onPointerLeave={handleOnPointerLeave} // TODO : investigate lag on hover. Something recomputes and makes it hiccup
+          ref={refBox}
+          material={materialAtomRaycast}
+        >
+          <circleBufferGeometry args={[1.5, 12, 12]} ref={refBoxGeometry} />
+          {/* <meshBasicMaterial
           side={DoubleSide}
           depthWrite={false}
           transparent
           opacity={0}
           toneMapped
-        />
-      </mesh>
+        /> */}
+        </mesh>
+      )}
 
       <Instance ref={ref} position={pos()} renderOrder={1} />
     </>

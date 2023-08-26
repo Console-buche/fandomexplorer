@@ -11,6 +11,7 @@ import {
   InstancedBufferAttribute,
   MathUtils,
   Mesh,
+  MeshBasicMaterial,
   ShaderMaterial,
   Vector2,
 } from 'three';
@@ -44,6 +45,17 @@ export const RingGrid = ({
     (state) => state.rickAndMorty.activeStatus
   );
   const currentSearch = useStoreSearch((state) => state.currentSearch);
+
+  const materialAtomRaycast = useMemo(
+    () =>
+      new MeshBasicMaterial({
+        depthWrite: false,
+        transparent: true,
+        side: DoubleSide,
+        opacity: 0,
+      }),
+    []
+  );
 
   const updateCountPerStatus = useStoreSearch(
     (state) => state.updateCountPerStatus
@@ -359,6 +371,7 @@ export const RingGrid = ({
                 tileIndex={i}
                 groupLength={groupLength}
                 refLePos={refLePos}
+                materialAtomRaycast={materialAtomRaycast}
               />
             ))}
         </Instances>

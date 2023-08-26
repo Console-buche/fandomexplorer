@@ -8,5 +8,6 @@ export const useStoreFandoms = create<GlobalState>(
     get: StoreApi<GlobalState>['getState']
   ) => ({
     rickAndMorty: createFandomSliceRickAndMorty(set, get),
+    // dbz: createFandomSliceDbz(set,get),
   })
 );

@@ -1,8 +1,7 @@
-import { Box, PerspectiveCamera, RenderTexture } from '@react-three/drei';
+import { PerspectiveCamera, RenderTexture } from '@react-three/drei';
 import { MeshProps } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
-import { Camera, Mesh, Vector3 } from 'three';
-import { Galaxy } from './galaxy/galaxy';
+import { Camera, Mesh } from 'three';
 
 export const Holoball = (props: MeshProps) => {
   const ref = useRef<Mesh>(null);
@@ -29,7 +28,6 @@ export const Holoball = (props: MeshProps) => {
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} />
 
-          <Galaxy position-z={2} position-x={0.1} />
         </RenderTexture>
       </meshBasicMaterial>
     </mesh>

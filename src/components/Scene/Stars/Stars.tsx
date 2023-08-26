@@ -1,7 +1,13 @@
 import { Merged, MeshDistortMaterial } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
-import { Star } from './Star.mesh';
-import { BoxGeometry, Mesh, MeshStandardMaterial, SphereGeometry } from 'three';
+import {
+  BoxGeometry,
+  Mesh,
+  MeshStandardMaterial,
+  Sphere,
+  SphereGeometry,
+} from 'three';
 
 function StarMesh() {
   return (
@@ -22,7 +28,7 @@ export const Planets = () => {
     () =>
       new Mesh(
         new BoxGeometry(1, 1, 1),
-        new MeshStandardMaterial({ color: 'red' })
+        new MeshStandardMaterial({ color: 'lime' })
       ),
     []
   );
@@ -42,7 +48,6 @@ export const Planets = () => {
       ),
     []
   );
-
   useEffect(() => {
     box1.position.set(-2, -2, 0);
     sphere1.position.set(2, 1, 0);
@@ -52,10 +57,20 @@ export const Planets = () => {
     <Merged meshes={[box1, sphere1]}>
       {(Box, Sphere) => (
         <>
-          <Box position={[-2, -2, 0]} color="red" />
-          <Box position={[-3, -3, 0]} color="tomato" />
-          <Sphere scale={0.7} position={[2, 1, 0]} color="green" />
-          <Sphere scale={0.7} position={[3, 2, 0]} color="teal" />
+          <Box position={[-2, 14, 0]} color="red" />
+          <Box position={[-6, 14, 0]} color="tomato">
+            <MeshDistortMaterial />
+          </Box>
+          <Sphere scale={0.7} position={[2, 14, 0]} color="green" />
+          <Sphere scale={0.7} position={[3, 14, 0]} color="teal" />
+          {Array.from({ length: 1000 }, (_, i) => i).map((e) => (
+            <Sphere
+              key={`${e}-mergedSphere`}
+              scale={0.7}
+              position={[e - 500, 14, 0]}
+              color={e % 2 === 0 ? 'teal' : 'yellow'}
+            />
+          ))}
         </>
       )}
     </Merged>

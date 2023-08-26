@@ -39,9 +39,9 @@ export const Cockpit = () => {
     shallow
   );
 
-  const { lookAt } = useStoreFandoms((state) =>
-    state.rickAndMorty.getPositionFromCurrentFilter()
-  );
+  // const { lookAt } = useStoreFandoms((state) =>
+  //   state.rickAndMorty.getPositionFromCurrentFilter()
+  // );
   const m = createDecayingOscillator();
   useEffect(() => {
     if (currentPath !== previousPath) {
@@ -49,7 +49,7 @@ export const Cockpit = () => {
     }
   }, [currentPath, previousPath]);
 
-  useFrame(({ clock }) => {
+  useFrame(() => {
     if (!refGroup.current) {
       return;
     }
@@ -74,13 +74,13 @@ export const Cockpit = () => {
     if (scrollDirection > 0) {
       refGroup.current.rotation.z = MathUtils.lerp(
         refGroup.current.rotation.z,
-        0.02,
+        0.0125,
         0.05
       );
     } else if (scrollDirection < 0) {
       refGroup.current.rotation.z = MathUtils.lerp(
         refGroup.current.rotation.z,
-        -0.02,
+        -0.0125,
         0.05
       );
     } else {

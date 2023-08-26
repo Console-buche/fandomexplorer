@@ -28,11 +28,7 @@ function updateAlphaProgressively(
   return alpha + step;
 }
 
-export const AsteroidRing = ({
-  radius,
-  renderOrder,
-  ...meshProps
-}: AsteroidRing) => {
+export const AsteroidRing = ({ radius, ...meshProps }: AsteroidRing) => {
   const meshRef = useRef<Mesh>(null);
   const matRef = useRef<ShaderMaterial>(null);
   const currentPath = useStoreNav((state) => state.currentPath);
