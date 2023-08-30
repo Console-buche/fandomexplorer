@@ -40,9 +40,10 @@ export function ModelAsMesh({ ...props }: JSX.IntrinsicElements['group']) {
   const v3s = createVector3Array(nodes.Text.geometry.attributes.position.array); // TODO : push the vectors to the navStore
 
   useEffect(() => {
-    const aliveV3s = v3s.map((v) => v.clone().multiplyScalar(1.4));
+    const aliveV3s = v3s.map((v) => v.clone().multiplyScalar(3.4));
     const unknownV3s = v3s.map((v) => v.clone().multiplyScalar(1.2));
     const deadV3s = v3s.map((v) => v.clone().multiplyScalar(0.3));
+
     setPositions404(aliveV3s, 'Alive');
     setPositions404(unknownV3s, 'unknown');
     setPositions404(deadV3s, 'Dead');

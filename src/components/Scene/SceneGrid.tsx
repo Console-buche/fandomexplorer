@@ -30,16 +30,14 @@ export const SceneGrid = () => {
     >
       <Ambient />
       <Stars depth={1000} />
-      <directionalLight intensity={3} />
 
-      <Planets />
+      {/* <Planets /> */}
 
       {/* <Star position={[0, 30, 0]} />
       <Star position={[12, 30, 0]} />
       <Star position={[-12, 30, 0]} /> */}
 
       <Page404 />
-      {/**/}
       <ScrollControls infinite pages={3} damping={0}>
         <Cam />
         <Cockpit />

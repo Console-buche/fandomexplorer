@@ -6,7 +6,6 @@ import { Interior } from './Interior';
 import { useEffect, useRef } from 'react';
 import { Group, MathUtils } from 'three';
 import { useFrame } from '@react-three/fiber';
-import { useStoreFandoms } from '@/stores/storeFandoms';
 import { useStoreNav } from '@/stores/storeNav';
 import { shallow } from 'zustand/shallow';
 import useScrollDirection from '@/hooks/useScroll';

@@ -9,8 +9,6 @@ export const PageHome = () => {
   return (
     <Suspense fallback={<div className={pageHomeLoader}>fetching...</div>}>
       <Search />
-      {/* Use offScreenCanvasByStatus if you want to load the images on demand */}
-      {/* <OffscreenCanvasByStatus /> */}
       <OffscreenCanvasPreloaded status="Alive" size={4096} />
       <OffscreenCanvasPreloaded status="Dead" size={4096} />
       <OffscreenCanvasPreloaded status="unknown" size={4096} />

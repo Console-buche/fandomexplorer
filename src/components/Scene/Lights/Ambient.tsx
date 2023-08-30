@@ -1,3 +1,3 @@
 export const Ambient = () => {
-  return <ambientLight intensity={2} />;
+  return <ambientLight intensity={1} />;
 };

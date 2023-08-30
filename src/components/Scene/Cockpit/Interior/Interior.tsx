@@ -1,10 +1,12 @@
 import useScrollDirection from '@/hooks/useScroll';
 import { useStoreCharacter } from '@/stores/storeCharacter';
 import { useStoreFandoms } from '@/stores/storeFandoms';
+import { useStoreNav } from '@/stores/storeNav';
 import { Plane, useScroll, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import {
+  Color,
   DoubleSide,
   Group,
   MathUtils,
@@ -21,6 +23,7 @@ let tScrollRight = 0;
 let tScrollLeft = 0;
 
 export const Interior = () => {
+  const currentPath = useStoreNav((state) => state.currentPath);
   const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
   const hasStarted = useStoreFandoms((state) => state.rickAndMorty.hasStarted);
 
@@ -50,6 +53,7 @@ export const Interior = () => {
   const refShipCables = useRef<MeshLambertMaterial>(null);
   const refShaderMaterialScreen = useRef<ShaderMaterial>(null);
 
+  const allRefs = [refThreeScreensRight, refThreeScreensLeft, refButtons, refScreenBorder, refShipRibbon, refShipCables, refShaderMaterialScreen];
   const scrollDirection = useScrollDirection();
   const scroll = useScroll();
 
@@ -74,6 +78,22 @@ export const Interior = () => {
       uHover: { value: 0 },
     };
   }, [texLayerScreen]);
+
+  // Update emissives to red on 404
+  useEffect(() => {
+    if (currentPath !== '/' && allRefs.every(r => r.current)) {
+
+      allRefs.forEach((r) => {
+        r.current!.emissive = new Color('#8B0000')
+      });
+
+    } else {
+      console.log('pouet')
+      allRefs.forEach((r) => {
+        r.current!.emissive = new Color('#FFFFFF')
+      });
+    }
+  }, [currentPath]);
 
   useEffect(() => {
     if (refShaderMaterialScreen.current) {
