@@ -27,8 +27,8 @@ export const Holocomputer = (props: MeshProps) => {
     refMat.current.needsUpdate = true;
   }, [currentPath, refMat, tex]);
 
-  const opacity = isEditing ? 1 : currentPath !== '/' ? 0.3 : 0.1;
-  const emissiveIntensity = isEditing ? 20 : currentPath !== '/' ? 20 : 0;
+  const opacity = isEditing ? 1 : currentPath !== '/' ? 0.1 : 0.1; 
+  const emissiveIntensity = isEditing ? 19 : currentPath !== '/' ? 20 : 0; 
 
   // const opacity = isEditing ? 1 : 0.1;
   // const emissiveIntensity = isEditing ? 20 : 0;

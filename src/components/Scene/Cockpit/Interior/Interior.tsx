@@ -1,4 +1,5 @@
 import useScrollDirection from '@/hooks/useScroll';
+import { a, useSpring } from '@react-spring/three';
 import { useStoreCharacter } from '@/stores/storeCharacter';
 import { useStoreFandoms } from '@/stores/storeFandoms';
 import { useStoreNav } from '@/stores/storeNav';
@@ -6,9 +7,7 @@ import { Plane, useScroll, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import {
-  Color,
   DoubleSide,
-  Group,
   MathUtils,
   Mesh,
   MeshLambertMaterial,
@@ -26,6 +25,11 @@ export const Interior = () => {
   const currentPath = useStoreNav((state) => state.currentPath);
   const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
   const hasStarted = useStoreFandoms((state) => state.rickAndMorty.hasStarted);
+
+
+  const color = useSpring({
+    hue: currentPath === '/' ? '#FFFFF' : '#8B0000',
+  });
 
   const tex = useTexture('assets/cockpit_cut_no_layers_v4.png');
   const texLayerRibbon = useTexture('assets/cockpit_cut_layer_ribbon.png');
@@ -53,7 +57,6 @@ export const Interior = () => {
   const refShipCables = useRef<MeshLambertMaterial>(null);
   const refShaderMaterialScreen = useRef<ShaderMaterial>(null);
 
-  const allRefs = [refThreeScreensRight, refThreeScreensLeft, refButtons, refScreenBorder, refShipRibbon, refShipCables, refShaderMaterialScreen];
   const scrollDirection = useScrollDirection();
   const scroll = useScroll();
 
@@ -79,21 +82,6 @@ export const Interior = () => {
     };
   }, [texLayerScreen]);
 
-  // Update emissives to red on 404
-  useEffect(() => {
-    if (currentPath !== '/' && allRefs.every(r => r.current)) {
-
-      allRefs.forEach((r) => {
-        r.current!.emissive = new Color('#8B0000')
-      });
-
-    } else {
-      console.log('pouet')
-      allRefs.forEach((r) => {
-        r.current!.emissive = new Color('#FFFFFF')
-      });
-    }
-  }, [currentPath]);
 
   useEffect(() => {
     if (refShaderMaterialScreen.current) {
@@ -134,7 +122,6 @@ export const Interior = () => {
     refShaderMaterialScreen.current.uniforms.uTime.value =
       clock.getElapsedTime();
 
-    // refButtons.current.emissiveIntensity = tScroll;
     refThreeScreensRight.current.emissiveIntensity = tScrollRight;
     refThreeScreensLeft.current.emissiveIntensity = tScrollLeft;
     tScrollRight =
@@ -146,7 +133,6 @@ export const Interior = () => {
       scroll.delta > 0 && scrollDirection === 1
         ? Math.min(tScrollLeft + 2, 25)
         : Math.max(tScrollLeft - 2, 2);
-    // tScroll = getScrollDeltaFromDirection(scrollDirection, scroll.delta, 30);
   });
   return (
     <>
@@ -154,19 +140,29 @@ export const Interior = () => {
         scale={1.01}
         ref={ref}
         args={[size.widthAtDepth, size.heightAtDepth]}
-        material-map={tex}
-        material-alphaTest={0.1}
-      />
-
+      >
+        {/* @ts-ignore */}
+        <a.meshLambertMaterial
+          map={tex} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          alphaTest={0.1}
+          transparent
+          toneMapped={false}
+          emissive={color.hue}
+          emissiveMap={tex}
+          emissiveIntensity={currentPath === '/' ? 0.1 : 0.}
+        />
+      </Plane>
       <mesh>
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
-        <meshLambertMaterial
+
+        {/* @ts-ignore */}
+        <a.meshLambertMaterial
           map={texLayerButtons} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           alphaTest={0.1}
           ref={refButtons}
           transparent
           toneMapped={false}
-          emissive={0xffffff}
+          emissive={color.hue}
           emissiveMap={texLayerButtons}
           emissiveIntensity={hasStarted ? 2 : 1}
         />
@@ -191,14 +187,16 @@ export const Interior = () => {
         <planeBufferGeometry
           args={[size.widthAtDepth + 0.02, size.heightAtDepth + 0.01]}
         />
-        <meshLambertMaterial
+        {/* @ts-ignore */}
+        <a.meshLambertMaterial
+
           map={texLayerCables} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           ref={refShipCables}
           transparent
           toneMapped={false}
           emissiveMap={texLayerCables}
           emissiveIntensity={hasStarted ? 60 : 1}
-          emissive={0xffffff}
+          emissive={color.hue}
           side={DoubleSide}
           opacity={0.1}
         />
@@ -208,14 +206,15 @@ export const Interior = () => {
         <planeBufferGeometry
           args={[size.widthAtDepth + 0.02, size.heightAtDepth + 0.01]}
         />
-        <meshLambertMaterial
+        {/* @ts-ignore */}
+        <a.meshLambertMaterial
           map={texLayerRibbon} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           ref={refShipRibbon}
           transparent
           toneMapped={false}
           emissiveMap={texLayerRibbon}
           emissiveIntensity={hasStarted ? 60 : 320}
-          emissive={0xffffff}
+          emissive={color.hue}
           side={DoubleSide}
           opacity={0.1}
         />
@@ -225,14 +224,16 @@ export const Interior = () => {
         <planeBufferGeometry
           args={[size.widthAtDepth + 0.01, size.heightAtDepth + 0.01]}
         />
-        <meshLambertMaterial
+        {/* @ts-ignore */}
+        <a.meshLambertMaterial
+
           map={texLayerScreenBorder} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           ref={refScreenBorder}
           transparent
           toneMapped={false}
           emissiveMap={texLayerScreenBorder}
           emissiveIntensity={hasStarted ? 5 : 1}
-          emissive={0xffffff}
+          emissive={color.hue}
           side={DoubleSide}
           opacity={0.1}
         />
@@ -241,7 +242,9 @@ export const Interior = () => {
       {/* THREE SCREENS PARTS */}
       <mesh>
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
-        <meshLambertMaterial
+        {/* @ts-ignore */}
+        <a.meshLambertMaterial
+
           map={texLayerThreeScreensRight} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           alphaTest={0.1}
           ref={refThreeScreensRight}
@@ -249,7 +252,7 @@ export const Interior = () => {
           toneMapped={false}
           emissiveMap={texLayerThreeScreensRight}
           emissiveIntensity={hasStarted ? 2 : 1}
-          emissive={0xffffff}
+          emissive={color.hue}
           side={DoubleSide}
         />
       </mesh>
@@ -258,7 +261,9 @@ export const Interior = () => {
 
       <mesh>
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
-        <meshLambertMaterial
+        {/* @ts-ignore */}
+        <a.meshLambertMaterial
+
           map={texLayerThreeScreensLeft} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           alphaTest={0.1}
           ref={refThreeScreensLeft}
@@ -266,7 +271,7 @@ export const Interior = () => {
           toneMapped={false}
           emissiveMap={texLayerThreeScreensLeft}
           emissiveIntensity={hasStarted ? 2 : 1}
-          emissive={0xffffff}
+          emissive={color.hue}
           side={DoubleSide}
         />
       </mesh>
