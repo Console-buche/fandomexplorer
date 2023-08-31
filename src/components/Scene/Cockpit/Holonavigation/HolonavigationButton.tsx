@@ -5,15 +5,17 @@ import { PathName, useStoreNav } from '@/stores/storeNav';
 import { useStoreSearch } from '@/stores/storeSearch';
 import { capitalizeFirstLetter } from '@/utils/strings';
 import Poppins from '@fonts/Poppins-Black.ttf';
+import { a, useSpring } from '@react-spring/three';
 import {
   Instance,
   Instances,
   Plane,
   Text,
+  useCursor,
   useTexture,
 } from '@react-three/drei';
 import { GroupProps, useFrame } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   BufferGeometry,
   MathUtils,
@@ -38,6 +40,13 @@ export const HolonavigationButton = ({
   ...props
 }: HolonavigationButton) => {
   const icon = useTexture(`assets/icon_${status.toLowerCase()}.png`);
+  const [isHovering, setIsHovering] = useState(false)
+  useCursor(isHovering)
+
+  const transitions = useSpring({
+    opacity: isHovering ? 1 : 0.45,
+  });
+
   const doorFrame = useTexture(`assets/icon_door.png`);
   const doorBottom = useTexture(`assets/icon_door_bottom.png`);
   const doorTop = useTexture(`assets/icon_door_top.png`);
@@ -132,7 +141,10 @@ export const HolonavigationButton = ({
   });
 
   return (
-    <group {...props} onClick={handleOnClick}>
+    <group {...props} onClick={handleOnClick}
+      onPointerEnter={() => setIsHovering(true)}
+      onPointerLeave={() => setIsHovering(false)}
+    >
       <Text
         color={isActive ? '#00ff00' : '#ffffff'}
         fontSize={0.033}
@@ -160,10 +172,15 @@ export const HolonavigationButton = ({
       <Plane
         args={[0.1, 0.1]}
         position={[-0.56, -0.01, 0.0013]}
-        material-map={icon}
-        material-transparent
-        material-alphaTest={0.5}
-      />
+      >
+        {/* @ts-ignore */}
+        <a.meshStandardMaterial
+          transparent
+          opacity={transitions.opacity}
+          map={icon}
+          alphaTest={0.1}
+        />
+      </Plane>
 
       <Plane
         args={[0.25, 0.13]}
