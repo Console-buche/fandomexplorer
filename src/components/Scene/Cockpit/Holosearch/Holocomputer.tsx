@@ -34,13 +34,12 @@ export const Holocomputer = (props: MeshProps) => {
   // const opacity = isEditing ? 1 : 0.1;
   // const emissiveIntensity = isEditing ? 20 : 0;
   useFrame(() => {
-
     if (!ref.current) {
       return
     }
-
     ref.current.position.y = -0.23 + Math.sin(Date.now() * 0.001) * 0.005;
   })
+
   return (
     <mesh
       ref={ref}

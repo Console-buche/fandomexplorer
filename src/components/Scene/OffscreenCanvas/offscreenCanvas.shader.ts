@@ -41,7 +41,7 @@ void main() {
 
 vec3 scale =  vec3(1., leIsShrinkAnimProgress , 1.);
 
-  scale = leIsSelected == 1. && leIsSearchTrue == 1. ? mix(scale, vec3(1.25), leAnimDisplacement) : scale ; // Adjust the scaling factor as desired
+  scale = leIsSelected == 1. && leIsSearchTrue == 1. ? mix(scale, vec3(1.75), leAnimDisplacement) : scale ; // Adjust the scaling factor as desired
 
   
 
