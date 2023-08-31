@@ -8,18 +8,6 @@ function getEpisode(episodes: string[]) {
   return episodes.map((episode) => episode.split('/').pop()).join(', ');
 }
 
-function getHumanReadableDate(date: string | undefined) {
-  if (!date) {
-    return undefined;
-  }
-
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
 export const Holodetails = (props: MeshProps) => {
   const character = useStoreCharacter((state) => state.activeCharacter);
 
@@ -39,23 +27,25 @@ export const Holodetails = (props: MeshProps) => {
   return (
     <mesh {...props}>
       <TypewriterText
+        fontSize={1.5}
+        typewrittenText={character?.name}
+        position={[0, 6.75, -10]}
+        textMaterial={textMaterial}
+        delay={5}
+      />
+      <TypewriterText
         typewrittenText={`${character?.gender ? character.gender : ''}${type}`}
-        position={[0, 7, -10]}
+        position={[0.1, 4.5, -10]}
         delay={5}
         textMaterial={textMaterial}
       />
 
-      <TypewriterText
-        typewrittenText={character?.name}
-        position={[0, 6.5, -10]}
-        textMaterial={textMaterial}
-        delay={5}
-      />
+
 
       <TypewriterText
         typewrittenText={character?.origin.name}
         delay={5}
-        position={[0, 6, -10]}
+        position={[0.1, 4, -10]}
         textMaterial={textMaterial}
       />
 
@@ -65,7 +55,7 @@ export const Holodetails = (props: MeshProps) => {
         maxWidth={8}
         letterSpacing={0.0175}
         typewrittenText={getEpisode(character?.episode ?? [])}
-        position={[0, 5, -10]}
+        position={[0.1, 3.5, -10]}
         textMaterial={textMaterial}
       />
     </mesh>
