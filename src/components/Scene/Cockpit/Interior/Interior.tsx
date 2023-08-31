@@ -29,9 +29,10 @@ export const Interior = () => {
 
   const color = useSpring({
     hue: currentPath === '/' ? '#FFFFF' : '#8B0000',
+    baseIllumination: currentPath === '/' ? '#FFFFF' : '#464646'
   });
 
-  const tex = useTexture('assets/cockpit_cut_no_layers_v4.png');
+  const texBase = useTexture('assets/cockpit_cut_no_layers_v4.png');
   const texLayerRibbon = useTexture('assets/cockpit_cut_layer_ribbon.png');
   const texLayerCables = useTexture('assets/cockpit_cut_no_layer_cables.png');
   const texLayerButtons = useTexture('assets/cockpit_cut_layer_buttons_v3.png');
@@ -143,12 +144,13 @@ export const Interior = () => {
       >
         {/* @ts-ignore */}
         <a.meshLambertMaterial
-          map={tex} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
+          map={texBase} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           alphaTest={0.1}
           transparent
+          color={color.baseIllumination}
           toneMapped={false}
           emissive={color.hue}
-          emissiveMap={tex}
+          emissiveMap={texBase}
           emissiveIntensity={currentPath === '/' ? 0.1 : 0.}
         />
       </Plane>

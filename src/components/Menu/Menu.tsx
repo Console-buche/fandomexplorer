@@ -45,22 +45,29 @@ export const Menu = () => {
         to="/"
         end
       >
-        Home
+        Back Home
       </NavLinkWithActiveStyle>
       <NavLinkWithActiveStyle
         className={Style.menu__item}
         activeClassName={Style.menu__item_active}
-        to="/about"
+        to="/ljelkjbrlgkjbelkrgjberg"
       >
-        About this Wiki
+        Test 404
       </NavLinkWithActiveStyle>
-      <NavLinkWithActiveStyle
-        className={Style.menu__item}
-        activeClassName={Style.menu__item_active}
-        to="/contact"
-      >
-        Contact
-      </NavLinkWithActiveStyle>
+      {/* <NavLinkWithActiveStyle */}
+      {/*   className={Style.menu__item} */}
+      {/*   activeClassName={Style.menu__item_active} */}
+      {/*   to="/about" */}
+      {/* > */}
+      {/*   About this Wiki */}
+      {/* </NavLinkWithActiveStyle> */}
+      {/* <NavLinkWithActiveStyle */}
+      {/*   className={Style.menu__item} */}
+      {/*   activeClassName={Style.menu__item_active} */}
+      {/*   to="/contact" */}
+      {/* > */}
+      {/*   Contact */}
+      {/* </NavLinkWithActiveStyle> */}
       {/* 
       <li>
         Todo : - virer le suspense - Ajouter une anim de loading sur le bouton
