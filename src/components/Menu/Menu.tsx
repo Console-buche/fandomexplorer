@@ -39,21 +39,21 @@ export const Menu = () => {
 
   return (
     <nav className={Style.menu}>
-      <NavLinkWithActiveStyle
-        className={Style.menu__item}
-        activeClassName={Style.menu__item_active}
-        to="/"
-        end
-      >
-        Back Home
-      </NavLinkWithActiveStyle>
-      <NavLinkWithActiveStyle
-        className={Style.menu__item}
-        activeClassName={Style.menu__item_active}
-        to="/ljelkjbrlgkjbelkrgjberg"
-      >
-        Test 404
-      </NavLinkWithActiveStyle>
+      {/* <NavLinkWithActiveStyle */}
+      {/*   className={Style.menu__item} */}
+      {/*   activeClassName={Style.menu__item_active} */}
+      {/*   to="/" */}
+      {/*   end */}
+      {/* > */}
+      {/*   Back Home */}
+      {/* </NavLinkWithActiveStyle> */}
+      {/* <NavLinkWithActiveStyle */}
+      {/*   className={Style.menu__item} */}
+      {/*   activeClassName={Style.menu__item_active} */}
+      {/*   to="/ljelkjbrlgkjbelkrgjberg" */}
+      {/* > */}
+      {/*   Test 404 */}
+      {/* </NavLinkWithActiveStyle> */}
       {/* <NavLinkWithActiveStyle */}
       {/*   className={Style.menu__item} */}
       {/*   activeClassName={Style.menu__item_active} */}

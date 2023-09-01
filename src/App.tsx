@@ -1,10 +1,10 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Menu } from './components/Menu';
 import { useQueryClient } from './hooks/useQueryClient';
 import { AppRoutes } from './routes';
 import { innerLayoutStyle, layoutStyle } from './style/global.css';
 import './style/index.css';
-import { Menu } from './components/Menu';
 
 function App() {
   const queryClient = useQueryClient();

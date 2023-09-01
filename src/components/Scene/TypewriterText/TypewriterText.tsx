@@ -1,8 +1,8 @@
 import Poppins from '@fonts/Poppins-Black.ttf';
 import { Text } from '@react-three/drei';
 import { MeshProps, useFrame } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { MeshStandardMaterial, ShaderMaterial, Vector3 } from 'three';
+import { useEffect, useRef, useState } from 'react';
+import { Mesh, MeshStandardMaterial, ShaderMaterial } from 'three';
 
 type TypewriterTextProps = {
   typewrittenText: string | undefined;
@@ -10,6 +10,8 @@ type TypewriterTextProps = {
   prefix?: string;
   delay?: number;
   fontSize?: number;
+  anchorX?: number | 'center';
+  anchorY?: number | 'top';
   letterSpacing?: number;
   maxWidth?: number;
   emissiveIntensity?: number;
@@ -25,6 +27,8 @@ export const TypewriterText = ({
   typewrittenText = '',
   fontSize = 0.4,
   prefix = '',
+  anchorX = 0,
+  anchorY = 0,
   textWrapper = { head: '[', tail: ']' },
   emissiveIntensity = 10,
   outLine,
@@ -34,6 +38,7 @@ export const TypewriterText = ({
 }: TypewriterTextProps) => {
   const [text, setText] = useState('');
 
+  const refText = useRef<Mesh>(null);
   const refShader = useRef<ShaderMaterial>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastWord = useRef<string | undefined>(undefined);
@@ -94,11 +99,11 @@ export const TypewriterText = ({
 
   return (
     <Text
+      ref={refText}
       font={fontFamily}
       letterSpacing={letterSpacing}
-      textAlign="left"
-      anchorX={0}
-      anchorY={0}
+      anchorX={anchorX}
+      anchorY={anchorY}
       maxWidth={maxWidth}
       fontSize={fontSize}
       overflowWrap="break-word"

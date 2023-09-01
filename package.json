@@ -13,8 +13,8 @@
     "@fastify/cors": "^8.2.1",
     "@pmndrs/assets": "^1.6.0",
     "@radix-ui/react-popover": "^1.0.5",
-    "@react-spring/web": "^9.7.2",
     "@react-spring/three": "^9.7.2",
+    "@react-spring/web": "^9.7.2",
     "@react-three/drei": "^9.68.3",
     "@react-three/fiber": "^8.13.0",
     "@react-three/postprocessing": "^2.14.9",
@@ -37,6 +37,7 @@
     "three-custom-shader-material": "^5.3.8",
     "three-stdlib": "^2.23.8",
     "ts-node": "^10.9.1",
+    "usehooks-ts": "^2.9.1",
     "zod": "^3.21.4",
     "zustand": "^4.3.8"
   },

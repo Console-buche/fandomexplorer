@@ -8,7 +8,6 @@ import { GroupProps, useFrame } from '@react-three/fiber';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   BufferGeometry,
-  DoubleSide,
   InstancedBufferAttribute,
   MathUtils,
   Matrix4,
@@ -143,9 +142,9 @@ export const AtomInstanced = ({
         radius: Math.min(
           groupLength * 0.475,
           groupLength *
-          0.475 *
-          (refLeAnimationProgress?.current?.getX(tileIndex) ?? 0) *
-          (refLesSpeeds.current?.getX(tileIndex) ?? 1)
+            0.475 *
+            (refLeAnimationProgress?.current?.getX(tileIndex) ?? 0) *
+            (refLesSpeeds.current?.getX(tileIndex) ?? 1)
         ),
         elementId: tileIndex,
         displacementFactor,

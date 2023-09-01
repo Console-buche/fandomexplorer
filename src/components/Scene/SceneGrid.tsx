@@ -11,9 +11,12 @@ import { Ambient } from './Lights';
 import { PostProcess } from './PostProcess';
 import { Planets } from './Stars/Stars';
 
+function test(myString: string): string {
+  return myString;
+}
+
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();
-
 
   const { data } = characterData;
   if (!data) {
@@ -71,7 +74,7 @@ function TrailDebris() {
   return (
     <Trail
       width={10} // Width of the line
-      color={'hotpink'} // Color of the line
+      color="hotpink" // Color of the line
       length={10} // Length of the line
       decay={4} // How fast the line fades away
       local={false} // Wether to use the target's world or local positions
