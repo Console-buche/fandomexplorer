@@ -1,15 +1,15 @@
+import useScrollDirection from '@/hooks/useScroll';
 import { Page404 } from '@/pages/404/Page404';
 import { useQueryGetCharactersFromFile } from '@/services/getCharacters/useQueryGetCharacters';
-import { ScrollControls, Stars, Stats, Trail } from '@react-three/drei';
+import { ScrollControls, Stars, Trail } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Mesh } from 'three';
 import { Cam } from './Cam';
 import { Cockpit } from './Cockpit/Cockpit';
 import { RingGrid } from './Grid/RingGrid';
 import { Ambient } from './Lights';
 import { PostProcess } from './PostProcess';
-import { Planets } from './Stars/Stars';
 
 function test(myString: string): string {
   return myString;
@@ -17,6 +17,17 @@ function test(myString: string): string {
 
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();
+
+  const randomTrails = useMemo(
+    () =>
+      Array.from({ length: 30 }, (i) => ({
+        key: i,
+        posY: Math.random() * 300 - 150,
+        posZ: Math.random() * 50 - 25,
+      })),
+
+    []
+  );
 
   const { data } = characterData;
   if (!data) {
@@ -47,9 +58,11 @@ export const SceneGrid = () => {
         <RingGrid status="Alive" characters={data} rotX={0.05} />
         <RingGrid status="Dead" characters={data} rotX={Math.PI / 3} />
         <RingGrid status="unknown" characters={data} rotX={Math.PI / -3} />
+        {randomTrails.map(({ key, posY, posZ }) => (
+          <TrailDebris key={key} posY={posY} posZ={posZ} />
+        ))}
       </ScrollControls>
       {/* <Stats /> */}
-      {/* <TrailDebris /> */}
       <PostProcess />
     </Canvas>
   );
@@ -59,23 +72,56 @@ export const SceneGrid = () => {
 // when scrolling, add randomy places debris around the current ring and make them move towards the opposite dir of the scroll
 // this will trigger the trail effect and give the impression of a trail of debris
 
-function TrailDebris() {
+function TrailDebris({ posY, posZ }: { posY: number; posZ: number }) {
   const ref = useRef<Mesh>(null);
+  const t = useRef(Math.random() * Math.PI * 2);
+  const arbitraryGrouLength = 140;
+  const direction = useScrollDirection();
 
   useFrame(() => {
-    if (!ref.current) {
-      return;
+    if (!ref.current || direction === 0 || t.current === null) {
+      return null;
     }
+    if (direction > 0) {
+      t.current -= 0.01;
+      ref.current.position.x =
+        arbitraryGrouLength * Math.cos(t.current) -
+        arbitraryGrouLength * Math.sin(t.current);
 
-    ref.current.position.x = Math.sin(0.005 * Date.now()) * 50;
-    ref.current.position.y = Math.sin(0.01 * Date.now()) * 10;
+      // ref.current.position.y = Math.sin(0.005 * Date.now()) * 20;
+
+      ref.current.position.y = posY;
+      ref.current.position.z =
+        (posZ + arbitraryGrouLength) * Math.cos(t.current) +
+        (posZ + arbitraryGrouLength) * Math.sin(t.current);
+    }
+    if (direction < 1) {
+      t.current += 0.01;
+      ref.current.position.x =
+        (posZ + arbitraryGrouLength) * Math.cos(t.current) -
+        (posZ + arbitraryGrouLength) * Math.sin(t.current);
+
+      // ref.current.position.y = Math.sin(0.005 * Date.now()) * 20;
+      ref.current.position.y = posY;
+      ref.current.position.z =
+        arbitraryGrouLength * Math.cos(t.current) +
+        arbitraryGrouLength * Math.sin(t.current);
+    }
+    // t += 0.01;
+    // ref.current.position.x =
+    //   arbitraryGrouLength * Math.cos(t) - arbitraryGrouLength * Math.sin(t);
+    //
+    // ref.current.position.y = Math.sin(0.005 * Date.now()) * 20;
+    //
+    // ref.current.position.z =
+    //   arbitraryGrouLength * Math.cos(t) + arbitraryGrouLength * Math.sin(t);
   });
 
   return (
     <Trail
-      width={10} // Width of the line
+      width={15} // Width of the line
       color="hotpink" // Color of the line
-      length={10} // Length of the line
+      length={20} // Length of the line
       decay={4} // How fast the line fades away
       local={false} // Wether to use the target's world or local positions
       stride={0} // Min distance between previous and current point
@@ -84,13 +130,13 @@ function TrailDebris() {
       attenuation={(width) => width} // A function to define the width in each point along it.
     >
       {/* If `target` is not defined, Trail will use the first `Object3D` child as the target. */}
-      <mesh position-z={200} ref={ref}>
+      <mesh ref={ref}>
         <sphereGeometry />
-        <meshBasicMaterial opacity={0} transparent alphaTest={1} />
+        <meshBasicMaterial opacity={1} transparent alphaTest={1} />
       </mesh>
 
       {/* You can optionally define a custom meshLineMaterial to use. */}
-      {/* <meshLineMaterial color={"red"} /> */}
+      {/* <lineBasicMaterial color="yellow" /> */}
     </Trail>
   );
 }

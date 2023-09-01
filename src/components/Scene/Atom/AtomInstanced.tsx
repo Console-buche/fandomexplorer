@@ -10,7 +10,6 @@ import {
   BufferGeometry,
   InstancedBufferAttribute,
   MathUtils,
-  Matrix4,
   Mesh,
   MeshBasicMaterial,
   Vector3,
@@ -38,21 +37,6 @@ type Atom = {
   materialAtomRaycast: MeshBasicMaterial;
 } & GroupProps;
 
-function computeLookAtRotationMatrix(
-  objectPosition: Vector3,
-  targetPosition: Vector3,
-  upDirection: Vector3
-): Matrix4 {
-  const zAxis = objectPosition.clone().sub(targetPosition).normalize();
-  const xAxis = upDirection.clone().cross(zAxis).normalize();
-  const yAxis = zAxis.clone().cross(xAxis).normalize();
-
-  const rotationMatrix = new Matrix4();
-  rotationMatrix.makeBasis(xAxis, yAxis, zAxis);
-
-  return rotationMatrix;
-}
-
 let time = 0;
 export const AtomInstanced = ({
   character,
@@ -69,7 +53,6 @@ export const AtomInstanced = ({
   refLesSpeeds,
   refLeTime,
   refLeIsSelected,
-  ...AtomProps
 }: Atom) => {
   const ref = useRef<Mesh>(null);
   const refBox = useRef<Mesh>(null);
@@ -154,7 +137,7 @@ export const AtomInstanced = ({
   );
 
   // TODO : don't have to check every frame here ?
-  useFrame(({ camera, gl }) => {
+  useFrame(() => {
     if (
       !ref.current ||
       !refLePos.current ||
@@ -243,7 +226,6 @@ export const AtomInstanced = ({
     }
 
     setIsSelected(true);
-    // updateActiveCharacter(character);
   };
 
   const handleOnPointerLeave = () => {
@@ -251,8 +233,6 @@ export const AtomInstanced = ({
       return;
     }
     setIsSelected(false);
-
-    // updateActiveCharacter(undefined);
   };
 
   return (
@@ -265,13 +245,6 @@ export const AtomInstanced = ({
           material={materialAtomRaycast}
         >
           <circleBufferGeometry args={[1.5, 12, 12]} ref={refBoxGeometry} />
-          {/* <meshBasicMaterial
-          side={DoubleSide}
-          depthWrite={false}
-          transparent
-          opacity={0}
-          toneMapped
-        /> */}
         </mesh>
       )}
 
