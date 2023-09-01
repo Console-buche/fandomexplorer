@@ -40,19 +40,15 @@ export const HolonavigationButton = ({
   ...props
 }: HolonavigationButton) => {
   const icon = useTexture(`assets/icon_${status.toLowerCase()}.png`);
-  const [isHovering, setIsHovering] = useState(false)
-  useCursor(isHovering)
-
-  const transitions = useSpring({
-    opacity: isHovering ? 1 : 0.45,
-  });
+  const [isHovering, setIsHovering] = useState(false);
+  useCursor(isHovering);
 
   const doorFrame = useTexture(`assets/icon_door.png`);
   const doorBottom = useTexture(`assets/icon_door_bottom.png`);
   const doorTop = useTexture(`assets/icon_door_top.png`);
-  const prevPath = useRef<PathName>(null);
 
   const currentPath = useStoreNav((state) => state.currentPath);
+  const isPageHome = currentPath === '/';
 
   const refShaderMat = useRef<ShaderMaterial>(null);
   const refDoor = useRef<BufferGeometry>(null);
@@ -87,20 +83,12 @@ export const HolonavigationButton = ({
     updateActiveStatus(status);
     updateActiveCharacter(undefined);
   }
-
-  const buttonMaterialActive = useMemo(
-    () =>
-      new MeshStandardMaterial({
-        emissive: 'purple',
-        emissiveIntensity: 2,
-        toneMapped: false,
-      }),
-    []
-  );
-
   const isActive = activeStatus === status;
 
-  const buttonMaterial = useMemo(() => new MeshStandardMaterial(), []);
+  const transitions = useSpring({
+    color: isActive ? '#00ff00' : '#ffffff',
+    opacity: isHovering || isActive ? 1 : 0.35,
+  });
 
   const leDoorPosition = useMemo(() => {
     const c = Array.from(
@@ -118,10 +106,7 @@ export const HolonavigationButton = ({
 
   useFrame(() => {
     if (!refShaderMat.current) return;
-    if (
-      currentPath === '/' &&
-      refShaderMat.current.uniforms.uTime.value < 0.07
-    ) {
+    if (isPageHome && refShaderMat.current.uniforms.uTime.value < 0.07) {
       refShaderMat.current.uniforms.uTime.value = MathUtils.clamp(
         refShaderMat.current.uniforms.uTime.value + 0.007 + index * 0.001,
         0,
@@ -141,38 +126,49 @@ export const HolonavigationButton = ({
   });
 
   return (
-    <group {...props} onClick={handleOnClick}
+    <group
+      {...props}
+      onClick={handleOnClick}
       onPointerEnter={() => setIsHovering(true)}
       onPointerLeave={() => setIsHovering(false)}
     >
       <Text
-        color={isActive ? '#00ff00' : '#ffffff'}
         fontSize={0.033}
         font={Poppins}
         letterSpacing={-0.025}
         textAlign="left"
         anchorX={0.5}
         anchorY={-0.03}
-        material={isActive ? buttonMaterialActive : buttonMaterial}
       >
+        {/* @ts-ignore */}
+        <a.meshStandardMaterial
+          toneMapped={false}
+          emissive="purple"
+          transparent
+          color={transitions.color}
+          opacity={transitions.opacity}
+        />
         {capitalizeFirstLetter(status)}
       </Text>
       <Text
-        color={isActive ? '#00ff00' : '#ffffff'}
         fontSize={0.035}
         font={Poppins}
         letterSpacing={-0.025}
         textAlign="left"
         anchorX={0.5}
         position-y={-0.027}
-        material={isActive ? buttonMaterialActive : buttonMaterial}
       >
+        {/* @ts-ignore */}
+        <a.meshStandardMaterial
+          toneMapped={false}
+          color={transitions.color}
+          emissive="purple"
+          transparent
+          opacity={transitions.opacity}
+        />
         {countPerStatus[status]}
       </Text>
-      <Plane
-        args={[0.1, 0.1]}
-        position={[-0.56, -0.01, 0.0013]}
-      >
+      <Plane args={[0.1, 0.1]} position={[-0.56, -0.01, 0.0013]}>
         {/* @ts-ignore */}
         <a.meshStandardMaterial
           transparent
