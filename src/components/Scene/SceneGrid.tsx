@@ -2,38 +2,43 @@ import useScrollDirection from '@/hooks/useScroll';
 import { Page404 } from '@/pages/404/Page404';
 import { useQueryGetCharactersFromFile } from '@/services/getCharacters/useQueryGetCharacters';
 import { ScrollControls, Stars, Trail } from '@react-three/drei';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
-import { Mesh } from 'three';
+import { Color, Group, Mesh, Vector3 } from 'three';
 import { Cam } from './Cam';
 import { Cockpit } from './Cockpit/Cockpit';
 import { RingGrid } from './Grid/RingGrid';
 import { Ambient } from './Lights';
 import { PostProcess } from './PostProcess';
+import { MeshLineMaterial, MeshLineMaterialParameters } from 'meshline';
 
-function test(myString: string): string {
-  return myString;
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      meshLineMaterial: MeshLineMaterialParameters;
+    }
+  }
 }
+
+extend({ MeshLineMaterial });
 
 export const SceneGrid = () => {
   const characterData = useQueryGetCharactersFromFile();
+  const { data } = characterData;
 
   const randomTrails = useMemo(
     () =>
-      Array.from({ length: 30 }, (i) => ({
-        key: i,
-        posY: Math.random() * 300 - 150,
-        posZ: Math.random() * 50 - 25,
+      Array.from({ length: 30 }, (_, i) => ({
+        key: `trail_${i}`,
+        posY: Math.random() * 150 - 75,
+        posZ: Math.random() * 100 - 50,
       })),
 
     []
   );
-
-  const { data } = characterData;
   if (!data) {
     return null;
   }
-
   return (
     <Canvas
       gl={{
@@ -58,9 +63,7 @@ export const SceneGrid = () => {
         <RingGrid status="Alive" characters={data} rotX={0.05} />
         <RingGrid status="Dead" characters={data} rotX={Math.PI / 3} />
         <RingGrid status="unknown" characters={data} rotX={Math.PI / -3} />
-        {randomTrails.map(({ key, posY, posZ }) => (
-          <TrailDebris key={key} posY={posY} posZ={posZ} />
-        ))}
+        <TrailsContainer randomTrails={randomTrails} />
       </ScrollControls>
       {/* <Stats /> */}
       <PostProcess />
@@ -68,60 +71,127 @@ export const SceneGrid = () => {
   );
 };
 
+type TrailsContainerProps = {
+  randomTrails: {
+    key: number;
+    posZ: number;
+    posX: number;
+  }[];
+};
+
+const TrailsContainer = ({ randomTrails }: TrailsContainerProps) => {
+  const direction = useScrollDirection();
+  const { camera } = useThree();
+
+  const lineMaterial = useMemo(() => {
+    return (
+      <meshLineMaterial
+        transparent
+        onBeforeCompile={(material) => {
+          material.uniforms.camPos = { value: camera.position };
+          material.uniforms.distVisible = { value: 200 }; // FIXME : make this dynamic by watching current ring radius
+
+          material.vertexShader = `
+            varying vec3 vPosition;
+            ${material.vertexShader}
+          `;
+          material.vertexShader = material.vertexShader.replace(
+            `void main() {`,
+            `void main() {
+              vPosition = position;
+            `
+          );
+
+          material.fragmentShader = `
+            varying vec3 vPosition;
+            uniform vec3 camPos;
+            uniform float distVisible;
+
+            void main() {
+              vec3 fragToCam = camPos - vPosition;
+              float distance = length(fragToCam);
+
+              if (distance > distVisible) {
+                gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+              } else {
+                gl_FragColor = vec4(1.0, 0.0, 1.0, 0.5);
+              }
+            }
+          `;
+        }}
+      />
+    );
+  }, [camera.position]);
+
+  return (
+    <>
+      {randomTrails.map(({ key, posY, posZ }) => (
+        <TrailDebris
+          lineMaterial={lineMaterial}
+          direction={direction}
+          key={key}
+          posY={posY}
+          posZ={posZ}
+        />
+      ))}
+    </>
+  );
+};
+
 // CONCEPT TODO :
 // when scrolling, add randomy places debris around the current ring and make them move towards the opposite dir of the scroll
 // this will trigger the trail effect and give the impression of a trail of debris
 
-function TrailDebris({ posY, posZ }: { posY: number; posZ: number }) {
+function TrailDebris({
+  direction,
+  posY,
+  posZ,
+  lineMaterial,
+}: {
+  lineMaterial: MeshLineMaterial;
+  direction: -1 | 0 | 1;
+  posY: number;
+  posZ: number;
+}) {
   const ref = useRef<Mesh>(null);
+  const refTrail = useRef<Mesh>(null);
   const t = useRef(Math.random() * Math.PI * 2);
-  const arbitraryGrouLength = 140;
-  const direction = useScrollDirection();
-
+  const arbitraryGrouLength = 150; // FIXME : make this dynamic by watching current ring radius
   useFrame(() => {
-    if (!ref.current || direction === 0 || t.current === null) {
+    if (!ref.current || t.current === null || !refTrail.current) {
       return null;
     }
-    if (direction > 0) {
-      t.current -= 0.01;
+
+    if (direction === -1) {
+      t.current += 0.01;
       ref.current.position.x =
         arbitraryGrouLength * Math.cos(t.current) -
         arbitraryGrouLength * Math.sin(t.current);
-
-      // ref.current.position.y = Math.sin(0.005 * Date.now()) * 20;
 
       ref.current.position.y = posY;
       ref.current.position.z =
         (posZ + arbitraryGrouLength) * Math.cos(t.current) +
         (posZ + arbitraryGrouLength) * Math.sin(t.current);
     }
-    if (direction < 1) {
-      t.current += 0.01;
+    if (direction === 1) {
+      t.current -= 0.01;
       ref.current.position.x =
         (posZ + arbitraryGrouLength) * Math.cos(t.current) -
         (posZ + arbitraryGrouLength) * Math.sin(t.current);
 
-      // ref.current.position.y = Math.sin(0.005 * Date.now()) * 20;
       ref.current.position.y = posY;
       ref.current.position.z =
         arbitraryGrouLength * Math.cos(t.current) +
         arbitraryGrouLength * Math.sin(t.current);
     }
-    // t += 0.01;
-    // ref.current.position.x =
-    //   arbitraryGrouLength * Math.cos(t) - arbitraryGrouLength * Math.sin(t);
-    //
-    // ref.current.position.y = Math.sin(0.005 * Date.now()) * 20;
-    //
-    // ref.current.position.z =
-    //   arbitraryGrouLength * Math.cos(t) + arbitraryGrouLength * Math.sin(t);
   });
 
   return (
     <Trail
       width={15} // Width of the line
-      color="hotpink" // Color of the line
-      length={20} // Length of the line
+      length={10} // Length of the line
+      opacity={0}
+      ref={refTrail}
       decay={4} // How fast the line fades away
       local={false} // Wether to use the target's world or local positions
       stride={0} // Min distance between previous and current point
@@ -129,14 +199,11 @@ function TrailDebris({ posY, posZ }: { posY: number; posZ: number }) {
       target={undefined} // Optional target. This object will produce the trail.
       attenuation={(width) => width} // A function to define the width in each point along it.
     >
-      {/* If `target` is not defined, Trail will use the first `Object3D` child as the target. */}
       <mesh ref={ref}>
         <sphereGeometry />
         <meshBasicMaterial opacity={1} transparent alphaTest={1} />
       </mesh>
-
-      {/* You can optionally define a custom meshLineMaterial to use. */}
-      {/* <lineBasicMaterial color="yellow" /> */}
+      {lineMaterial}
     </Trail>
   );
 }
