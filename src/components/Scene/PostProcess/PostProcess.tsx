@@ -1,13 +1,13 @@
 import { useStoreFandoms } from '@/stores/storeFandoms';
 import { useStoreNav } from '@/stores/storeNav';
 import { easeOutCubic } from '@/utils/easings';
-import { useFrame } from '@react-three/fiber';
 import {
   Bloom,
   EffectComposer,
   ToneMapping,
+  Vignette,
 } from '@react-three/postprocessing';
-import { ToneMappingEffect } from 'postprocessing';
+import { ToneMappingEffect, VignetteEffect } from 'postprocessing';
 import { useEffect, useRef, useState } from 'react';
 import { MathUtils } from 'three';
 
@@ -18,6 +18,7 @@ type ToneMappingEffectOptions = ConstructorParameters<
 export const PostProcess = () => {
   const [factor, setFactor] = useState(0);
   const refTone = useRef<ToneMappingEffectOptions>(null);
+  const refVignette = useRef<typeof VignetteEffect>(null);
   const currentPath = useStoreNav((state) => state.currentPath);
   const hasStarted = useStoreFandoms((state) => state.rickAndMorty.hasStarted);
   const isPath404 = currentPath !== '/' && currentPath !== '/about';
@@ -37,28 +38,11 @@ export const PostProcess = () => {
     return () => clearInterval(intervalId);
   }, [hasStarted]);
 
-  // useFrame(() => {
-  //   if (!refTone.current) return;
-  //   if (isPath404) {
-  //     refTone.current.minLuminance =
-  //       2 - MathUtils.lerp(refTone.current.minLuminance ?? 0, 0, 0.001);
-  //   }
-
-  //   if (hasStarted && !isPath404) {
-  //     refTone.current.minLuminance =
-  //       2 - MathUtils.lerp(refTone.current.minLuminance ?? 0, 2, 0.001);
-
-  //     refTone.current.middleGrey = MathUtils.lerp(
-  //       refTone.current.middleGrey ?? 0,
-  //       0.2,
-  //       0.0001
-  //     );
-  //   }
-  // });
-
   return (
     <EffectComposer disableNormalPass multisampling={4}>
       <Bloom mipmapBlur luminanceThreshold={1} />
+      <Vignette ref={refVignette} darkness={0.35} />
+
       <ToneMapping
         // @ts-ignore
         ref={refTone}

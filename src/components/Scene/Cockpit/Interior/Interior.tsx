@@ -26,10 +26,9 @@ export const Interior = () => {
   const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
   const hasStarted = useStoreFandoms((state) => state.rickAndMorty.hasStarted);
 
-
   const color = useSpring({
     hue: currentPath === '/' ? '#FFFFF' : '#8B0000',
-    baseIllumination: currentPath === '/' ? '#FFFFF' : '#464646'
+    baseIllumination: currentPath === '/' ? '#FFFFF' : '#464646',
   });
 
   const texBase = useTexture('assets/cockpit_cut_no_layers_v4.png');
@@ -82,7 +81,6 @@ export const Interior = () => {
       uHover: { value: 0 },
     };
   }, [texLayerScreen]);
-
 
   useEffect(() => {
     if (refShaderMaterialScreen.current) {
@@ -151,7 +149,7 @@ export const Interior = () => {
           toneMapped={false}
           emissive={color.hue}
           emissiveMap={texBase}
-          emissiveIntensity={currentPath === '/' ? 0.1 : 0.}
+          emissiveIntensity={currentPath === '/' ? 0.1 : 0}
         />
       </Plane>
       <mesh>
@@ -191,7 +189,6 @@ export const Interior = () => {
         />
         {/* @ts-ignore */}
         <a.meshLambertMaterial
-
           map={texLayerCables} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           ref={refShipCables}
           transparent
@@ -228,7 +225,6 @@ export const Interior = () => {
         />
         {/* @ts-ignore */}
         <a.meshLambertMaterial
-
           map={texLayerScreenBorder} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           ref={refScreenBorder}
           transparent
@@ -246,7 +242,6 @@ export const Interior = () => {
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
         {/* @ts-ignore */}
         <a.meshLambertMaterial
-
           map={texLayerThreeScreensRight} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           alphaTest={0.1}
           ref={refThreeScreensRight}
@@ -265,7 +260,6 @@ export const Interior = () => {
         <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
         {/* @ts-ignore */}
         <a.meshLambertMaterial
-
           map={texLayerThreeScreensLeft} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           alphaTest={0.1}
           ref={refThreeScreensLeft}
