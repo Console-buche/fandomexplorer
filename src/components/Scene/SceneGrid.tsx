@@ -1,21 +1,37 @@
 import useScrollDirection from '@/hooks/useScroll';
 import { Page404 } from '@/pages/404/Page404';
 import { useQueryGetCharactersFromFile } from '@/services/getCharacters/useQueryGetCharacters';
-import { ScrollControls, Stars, Trail } from '@react-three/drei';
-import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
+import { ScrollControls, Stars, Stats, Trail } from '@react-three/drei';
+import {
+  Canvas,
+  extend,
+  MaterialProps,
+  useFrame,
+  useThree,
+} from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
-import { MathUtils, Mesh, NormalBlending } from 'three';
+import {
+  BufferGeometry,
+  Material,
+  MathUtils,
+  Mesh,
+  MeshBasicMaterial,
+  NormalBlending,
+  Vector2,
+} from 'three';
 import { Cam } from './Cam';
 import { Cockpit } from './Cockpit/Cockpit';
 import { RingGrid } from './Grid/RingGrid';
 import { Ambient } from './Lights';
 import { PostProcess } from './PostProcess';
 import { MeshLineMaterial, MeshLineMaterialParameters } from 'meshline';
+import { Planets } from './Stars/Stars';
+import { Geometry } from 'three-stdlib';
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      meshLineMaterial: MeshLineMaterialParameters;
+      meshLineMaterial: MeshLineMaterialParameters & Partial<Material>;
     }
   }
 }
@@ -28,7 +44,7 @@ export const SceneGrid = () => {
 
   const randomTrails = useMemo(
     () =>
-      Array.from({ length: 60 }, (_, i) => ({
+      Array.from({ length: 10 }, (_, i) => ({
         key: `trail_${i}`,
         posY: Math.random() * 150 - 75,
         posZ: Math.random() * 60 - 30,
@@ -43,14 +59,14 @@ export const SceneGrid = () => {
     <Canvas
       gl={{
         alpha: true,
-        antialias: true,
       }}
       dpr={[1, 2]}
     >
       <Ambient />
       <Stars depth={1000} />
 
-      {/* <Planets /> */}
+      {/* TODO: Optimise planets and distribute them arround as nice models. They can be sprites too taken from an atlas for performance reaons */}
+      <Planets />
 
       {/* <Star position={[0, 30, 0]} />
       <Star position={[12, 30, 0]} />
@@ -73,9 +89,9 @@ export const SceneGrid = () => {
 
 type TrailsContainerProps = {
   randomTrails: {
-    key: number;
+    key: string;
     posZ: number;
-    posX: number;
+    posY: number;
   }[];
 };
 
@@ -86,15 +102,13 @@ const TrailsContainer = ({ randomTrails }: TrailsContainerProps) => {
   const lineMaterial = useMemo(() => {
     return (
       <meshLineMaterial
-        transparent
-        onBeforeCompile={(material) => {
+        // TODO: check what resolution is used for in that class
+        resolution={new Vector2(1, 1)}
+        onBeforeCompile={(material: MeshLineMaterial) => {
           material.uniforms.camPos = { value: camera.position };
           material.uniforms.distVisible = { value: 200 }; // FIXME : make this dynamic by watching current ring radius
 
-          material.vertexShader = `
-            varying vec3 vPosition;
-            ${material.vertexShader}
-          `;
+          material.vertexShader = ``;
           material.vertexShader = material.vertexShader.replace(
             `void main() {`,
             `void main() {
@@ -112,9 +126,9 @@ const TrailsContainer = ({ randomTrails }: TrailsContainerProps) => {
               float distance = length(fragToCam);
 
               if (distance > distVisible) {
-                gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+                discard;
               } else {
-                gl_FragColor = vec4(1.0, 0.0, 1.0, 0.35);
+                gl_FragColor = vec4(1.0, 0.0, 1.0, 1);
               }
             }
           `;
@@ -148,12 +162,12 @@ function TrailDebris({
   posZ,
   lineMaterial,
 }: {
-  lineMaterial: MeshLineMaterial;
+  lineMaterial: Partial<MeshLineMaterial>;
   direction: -1 | 0 | 1;
   posY: number;
   posZ: number;
 }) {
-  const ref = useRef<Mesh>(null);
+  const ref = useRef<Mesh<BufferGeometry, Material>>(null);
   const refTrail = useRef<Mesh>(null);
   const t = useRef(Math.random() * Math.PI * 2);
   const arbitraryGrouLength = 145; // FIXME : make this dynamic by watching current ring radius
@@ -207,7 +221,6 @@ function TrailDebris({
       target={undefined} // Optional target. This object will produce the trail.
       attenuation={(width) => width} // A function to define the width in each point along it.
     >
-      c
       <mesh ref={ref} scale={0.3}>
         <sphereGeometry />
         <meshStandardMaterial
