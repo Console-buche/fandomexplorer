@@ -71,7 +71,8 @@ export const SceneGrid = () => {
       {/* <Star position={[0, 30, 0]} />
       <Star position={[12, 30, 0]} />
       <Star position={[-12, 30, 0]} /> */}
-
+      {/* <StatsGl /> */}
+      {/* <Stats /> */}
       <Page404 />
       <ScrollControls infinite pages={3} damping={0}>
         <Cam />

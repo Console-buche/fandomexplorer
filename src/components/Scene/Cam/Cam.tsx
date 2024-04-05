@@ -1,9 +1,15 @@
 import useScrollDirection from '@/hooks/useScroll';
 import { useStoreFandoms } from '@/stores/storeFandoms';
 import { PerspectiveCamera, useScroll } from '@react-three/drei';
-import { Camera, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Euler, MathUtils, Matrix4, Vector3 } from 'three';
+import {
+  Euler,
+  MathUtils,
+  Matrix4,
+  Vector3,
+  PerspectiveCamera as PCam,
+} from 'three';
 import { getScrollDeltaFromDirection } from './utils';
 
 function getPositionOnCircle(radius: number, angle: number): Vector3 {
@@ -26,7 +32,7 @@ function getPositionOnCircle(radius: number, angle: number): Vector3 {
 let t = 0;
 
 export const Cam = () => {
-  const refCam = useRef<Camera>(null);
+  const refCam = useRef<PCam>(null);
   const prevRotX = useRef<number>(0);
 
   const { pos, rotX, lookAt } = useStoreFandoms((state) =>
