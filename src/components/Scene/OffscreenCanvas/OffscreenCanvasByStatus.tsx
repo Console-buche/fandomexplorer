@@ -1,4 +1,4 @@
-import { StrictObject } from '@/components/utils.ts/strictObject';
+import { StrictObject } from '@/utils/strictObject';
 import { useQueryGetCharactersFromFileWithLoadedImages } from '@/services/getCharacters/useQueryGetCharacters';
 import { OffscreenCanvas } from './OffscreenCanvas';
 

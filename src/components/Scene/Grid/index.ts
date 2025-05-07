@@ -1,1 +1,1 @@
-export { GridCircle } from './GridCircle';
+export { RingGrid } from './RingGrid';

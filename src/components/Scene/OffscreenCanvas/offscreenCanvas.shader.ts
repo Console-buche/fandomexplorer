@@ -1,17 +1,24 @@
 export const vertexShaderAtlas = `
-varying vec2 vUv;
 attribute float tileIndex;
-uniform int elementsCount;
+uniform float elementsCount;
 uniform float radius;
 uniform int currentElementId;
 uniform float uTime; // new uniform for time
 
-varying float vTileIndex;
 attribute vec3 lePos;
 attribute float leIsSelected;
 attribute float speed;
+attribute float leAnimDisplacement;
+attribute float leIsSearchTrue;
+attribute float leIsShrinkAnimProgress;
+
+varying vec2 vUv;
+varying float vTileIndex;
 varying float vIsSelected;
 varying float vDepth;
+varying float vLeIsSearchTrue;
+varying float vLeIsShrinkAnimProgress;
+varying float vAlphaBasedOnDistance;
 
 attribute float animationProgress;
 
@@ -19,6 +26,8 @@ void main() {
   vUv = uv;
   vTileIndex = tileIndex;
   vIsSelected = leIsSelected;
+  vLeIsSearchTrue = leIsSearchTrue;
+  vLeIsShrinkAnimProgress= leIsShrinkAnimProgress;
   
   vec3 pos = lePos;
   
@@ -29,29 +38,61 @@ void main() {
   vec3 up = vec3(direction.z, 0.0, -direction.x) * -1.;
 
   // Scale factor based on leIsSelected
-  vec3 scale = vec3(1.0);
-  if (leIsSelected > 0.0) {
-    scale = vec3(3.); // Adjust the scaling factor as desired
-  }
+
+vec3 scale =  vec3(1., leIsShrinkAnimProgress , 1.);
+
+  scale = leIsSelected == 1. && leIsSearchTrue == 1. ? mix(scale, vec3(1.75), leAnimDisplacement) : scale ; // Adjust the scaling factor as desired
+
+  
 
   // Set z displacement for selected element
-  float displaceSelectedZ = 3.;
+  float displaceSelectedZ = leIsSearchTrue == 1. ? leAnimDisplacement : 0.;
   
   // Calculate the model matrix with scaling, rotation, translation, and local z-axis movement
   mat4 modelMatrix = mat4(
     vec4(scale.x * up, 0.0),
     vec4(scale.y * cross(up, direction), 0.0),
     vec4(-scale.z * direction, 0.0),
-    vec4(pos + leIsSelected * direction * displaceSelectedZ, 1.0) // Move along the local z-axis if selected
+    vec4(pos +  direction * displaceSelectedZ, 1.0) // Move along the local z-axis if selected
   );
 
-  vec4 glPosition = projectionMatrix * modelViewMatrix * modelMatrix * vec4(position, 1.0);
-  vDepth = glPosition.z;
+  vec3 lePos = position;
+  float verticesInMyElement = 20.;
+  float waveAmplitude = vLeIsSearchTrue == 1. ?  0. : mix(0., 10., 1.-leIsShrinkAnimProgress);
+  float waveFreq = vLeIsSearchTrue == 1. ?  0. : mix(0., 2000., 1.-leIsShrinkAnimProgress);
+  float waveSpeed = vLeIsSearchTrue == 1. ?  1. :  mix(0., 20., 1.-leIsShrinkAnimProgress);
+
+  float globalVertexIndex = vTileIndex * verticesInMyElement + vUv.x * verticesInMyElement;
+
+  // Add a per-element offset to each vertex based on tileIndex and vUv.x
+  float elementOffset = sin(tileIndex * 0.1 + vUv.x * 6.2831) * 0.5; // Adjust the offset as desired
   
-  // Transform the vertex position by the model matrix
-  gl_Position = glPosition;
+  float angle = 2.0 * 3.1415926535897932384626433832795 * ((globalVertexIndex + elementOffset) / (float(elementsCount) * verticesInMyElement));
+
+  // Apply a separate wave effect for the internal portion (uv.x between 0.1 and 0.9)
+
+  if (leIsSearchTrue == 0.) {
+
+  if (vUv.x > 0.1 && vUv.x < 0.9) {
+    float internalWaveAmplitude = mix(0., vUv.x, 1.-leIsShrinkAnimProgress); // Adjust the amplitude for the internal portion
+    float internalWaveFreq = mix(0., 500., 1.-leIsShrinkAnimProgress); // Adjust the frequency for the internal portion
+    lePos.y += mix(0., sin(uTime * waveSpeed + angle * internalWaveFreq) * internalWaveAmplitude, 1.-leIsShrinkAnimProgress);
+  } else {
+    lePos.y += mix(0., sin(uTime * waveSpeed + angle * waveFreq) * waveAmplitude, 1.-leIsShrinkAnimProgress);
+  }
+
 }
 
+lePos.y = mix(position.y, lePos.y , 1.-leIsShrinkAnimProgress);
+    
+  
+  vec4 glPosition = projectionMatrix * modelViewMatrix * modelMatrix * vec4(lePos, 1.0);
+  vDepth = glPosition.z;
+
+  // Transform the vertex position by the model matrix
+vAlphaBasedOnDistance = distance(modelMatrix * vec4(lePos, 1.0), vec4(0., 0., 0., 1.));
+  gl_Position = glPosition;
+}
 `;
 
 export const fragmentShaderAtlas = `
@@ -61,10 +102,66 @@ uniform float textureWidth;
 uniform float textureHeight;
 uniform float uTime; // new uniform for time
 varying float vIsSelected;
+uniform vec3 camPosition;
+uniform float uIsAnimatingIn;
 
+varying float vLeIsSearchTrue;
 varying float vDepth;
 varying float vTileIndex;
+varying float vLeIsShrinkAnimProgress;
 varying vec2 vUv;
+varying float vAlphaBasedOnDistance;
+
+
+
+
+// PORTAL
+
+vec2 hash( vec2 p ) {
+            mat2 m = mat2( 15.32, 83.43, 117.38, 289.59 );
+            return fract( sin( m * p) * 46783.289 );
+        }
+
+        float voronoi( vec2 p ) {
+            vec2 g = floor( p );
+            vec2 f = fract( p );
+            float distanceFromPointToCloestFeaturePoint = 1.0;
+
+            for( int y = -1; y <= 1; ++y ) {
+                for( int x = -1; x <= 1; ++x ) {
+                    vec2 latticePoint = vec2( x, y );
+                    float h = distance( latticePoint + hash( g + latticePoint), f );
+                    distanceFromPointToCloestFeaturePoint = min( distanceFromPointToCloestFeaturePoint, h ); 
+                }
+            }
+            return 1.0 - sin(distanceFromPointToCloestFeaturePoint);
+        }
+
+        float texture(vec2 uv) {
+            float t = voronoi( uv * 8.0 + vec2(uTime) );
+            t *= 1.0 - length(uv * 2.0);
+            return t;
+        }
+
+        float fbm( vec2 uv ) {
+            float sum = 0.00;
+            float amp = 1.0;
+
+            for( int i = 0; i < 4; ++i ) {
+                sum += texture( uv ) * amp;
+                uv += uv;
+                amp *= 0.8;
+            }
+            return sum;
+        }
+
+        vec4 portaled(vec2 vUv) {
+        
+            float t = pow( fbm( vUv * 0.3 ), 2.0);
+            return vec4( vec3( t * 2.0, t * 4.0, t * 8.0 ), 1.0 );
+        }
+
+// END OF PORTAL
 
 float squareShape(vec2 uv, float size) {
     float left = 0.5 - size / 2.0;
@@ -78,72 +175,71 @@ float squareShape(vec2 uv, float size) {
 }
 
 
-
 void main() {
   vec2 atlasPosition = vec2(mod(vTileIndex, textureWidth), floor(vTileIndex / textureWidth));
   vec2 uv = (atlasPosition + vUv) / vec2(textureWidth, textureHeight);
   vec4 color = texture2D(textureAtlas, uv);
 
  
-
     // Control opacity based on depth and on lateral distance from center
     float depthOpacity =   600. / vDepth  * 600. / vDepth - 3.75 ;
+
     // float depthOpacity = 3.-vDepth / 140.;
     float depthThreshhold = 3.-vDepth / 20.;
     float center = resolution.x / 2.0;
     float distanceFromCenter = depthThreshhold < 0. ? 0. : abs(gl_FragCoord.x - center);
     float fadeWidth = resolution.x * 0.49;  // Adjust the fade width as desired
 
-    // Add a sci-fi border on the selected element
 
-    float y = vUv.y;
-    float x = vUv.x;
+    float lateralOpacity = 1.;
 
-
-
-float borderSize = 0.15; // adjust this to change border width
-float borderDepth = 0.05; // adjust this to change border depth
-
-float hollow = (
-    (y > (0.5 + 0.5 - borderDepth) || y < (0.5 - 0.5 + borderDepth) || x > (0.5 + 0.5 - borderDepth) || x < (0.5 - 0.5 + borderDepth)) &&
-    !((x < (0.5 - 0.5 + 2.0 * borderSize) && y < (0.5 - 0.5 + 2.0 * borderSize) && x > (0.5 - 0.5 + borderSize) && y > (0.5 - 0.5 + borderSize)) ||
-      (x > (0.5 + 0.5 - 2.0 * borderSize) && y < (0.5 - 0.5 + 2.0 * borderSize) && x < (0.5 + 0.5 - borderSize) && y > (0.5 - 0.5 + borderSize)) ||
-      (x < (0.5 - 0.5 + 2.0 * borderSize) && y > (0.5 + 0.5 - 2.0 * borderSize) && x > (0.5 - 0.5 + borderSize) && y < (0.5 + 0.5 - borderSize)) ||
-      (x > (0.5 + 0.5 - 2.0 * borderSize) && y > (0.5 + 0.5 - 2.0 * borderSize) && x < (0.5 + 0.5 - borderSize) && y < (0.5 + 0.5 - borderSize)) ||
-      (x > (0.5 - 0.5 + 2.0 * borderSize) && x < (0.5 + 0.5 - 2.0 * borderSize)) || 
-      (y > (0.5 - 0.5 + 2.0 * borderSize) && y < (0.5 + 0.5 - 2.0 * borderSize)))
-) ? 0. : 1.;
+    // Apply custom tone mapping to balance out the global tone mapping applied for glowing 
+    vec3 toneMappedColor = pow(color.rgb, vec3(1.5));
 
 
 
 
+    float filteredOpacity = vLeIsSearchTrue > 0. ? 1. : .2;
+    gl_FragColor = vec4(toneMappedColor, max(0., min(1., depthOpacity * lateralOpacity)) * filteredOpacity    ) ;
 
 
-  float lateralOpacity = 1.;
-  // float lateralOpacity = smoothstep(fadeWidth, 0.0, distanceFromCenter);
 
-  // if (hollow == 0. && vIsSelected == 1.) {
+    // STYLE if is not found in search
 
-  //   gl_FragColor = vec4(0.3, 0.3, 0.3, depthOpacity * lateralOpacity);
+    float style = vLeIsSearchTrue == 1. ? 1. : 10.;
 
-  // } else {
-    
-    
-    float halfBorderSize = vIsSelected == 1. ? 0.075 : 0.;
-    // float halfBorderSize = borderSize / 1.5;
-    
-    gl_FragColor = vec4(vec3(color) * 1.1, depthOpacity * lateralOpacity);
+    if (vLeIsSearchTrue == 0.) {
+        // vec3 zapColor = vec3(0.0, 0.0, 0.0);
+        // if (uv.x < 0.1 && uv.x > 0.9) {
+        //     zapColor = vec3(0.133333, 0.047059, 0.890196);
+        // }
+        // if (uv.x > 0.1 && uv.x< 0.9) {
+        //     zapColor = vec3(0.105882, 0.890196, 0.047059);
+        // }
+        // if (uv.x > 0.4 && uv.x < 0.6) {
+        //     zapColor = vec3(0.701961, 0.047059, 0.890196);
+        // }
+    gl_FragColor *= mix(1., sin(uTime  + vTileIndex * uv.x * 0.1  ) * .1 + 10., 1.-vLeIsShrinkAnimProgress );
+    }
 
-    // if (vUv.y < halfBorderSize || vUv.y > 1.0 - halfBorderSize || vUv.x > 1.-halfBorderSize || vUv.x < halfBorderSize) {
-    //   gl_FragColor = vec4(0.);
-    // }
-    
-  // }
+    // TODO HERE : implement a per image anim/shape, more natural/organic
 
-  // TODO HERE : implement a per image anim/shape, more natural/organic
+    // if ((sin(uTime + vTileIndex / 100. ) + 1.) / 2. < vUv.y && vIsSelected == 0. ) {
+    //   discard;
+   // }
 
-  // if ((sin(uTime + vTileIndex / 100. ) + 1.) / 2. < vUv.y && vIsSelected == 0. ) {
-  //   discard;
-  // }
+
+// Define the maximum distance that will affect the opacity.
+float maxDistance = 50.0;
+
+// Make sure vAlphaBasedOnDistance doesn't exceed the maxDistance.
+float clampedDistance = min(vAlphaBasedOnDistance, maxDistance);
+
+// Calculate the normalized alpha. Elements beyond maxDistance will have alpha = 1.
+float normalizedAlpha = clampedDistance / maxDistance;
+
+// Use the normalized alpha to adjust the fragment's opacity.
+gl_FragColor.a *= normalizedAlpha;
+
 }
 `;

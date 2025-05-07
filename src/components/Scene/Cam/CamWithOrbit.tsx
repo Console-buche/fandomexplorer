@@ -1,12 +1,12 @@
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { Camera, useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
-import { Vector3 } from 'three';
+import { Vector3, type PerspectiveCamera as PCam } from 'three';
 
 let t = 0;
 let time = 0;
 export const CamWithOrbit = () => {
-  const refCam = useRef<Camera>(null);
+  const refCam = useRef<PCam>(null);
   const refLookAt = useRef(new Vector3(0, -100, 0));
 
   useEffect(() => {

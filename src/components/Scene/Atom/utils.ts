@@ -1,3 +1,4 @@
+import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
 import { Vector3 } from 'three';
 
 interface LookAtOptions {
@@ -21,4 +22,12 @@ export function calculateLookAt(options: LookAtOptions): Vector3 {
   const lookAt = finalPosition.clone().add(direction);
 
   return lookAt;
+}
+
+// filter character object on name key by a string
+export function filterCharacterByName(
+  character: CharacterSchema,
+  filter: string
+) {
+  return character.name.toLowerCase().includes(filter.toLowerCase());
 }

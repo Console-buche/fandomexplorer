@@ -1,133 +1,91 @@
 import useScrollDirection from '@/hooks/useScroll';
-import { PerspectiveCamera, Sphere, useScroll } from '@react-three/drei';
-import { Camera, useFrame } from '@react-three/fiber';
-import { useEffect, useRef, useState } from 'react';
-import { BackSide, Euler, MathUtils, Matrix4, Mesh, Vector3 } from 'three';
+import { useStoreFandoms } from '@/stores/storeFandoms';
+import { PerspectiveCamera, useScroll } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
+import {
+  Euler,
+  MathUtils,
+  Matrix4,
+  Vector3,
+  PerspectiveCamera as PCam,
+} from 'three';
 import { getScrollDeltaFromDirection } from './utils';
-import { useStoreCharacter } from '@/stores/storeCharacter';
-import { useDebounce } from '@/hooks/useDebounce';
 
-function getRotationMatrix(rotation: Vector3): THREE.Matrix4 {
-  const euler = new Euler(rotation.x, rotation.y, rotation.z, 'XYZ');
-  const rotationMatrix = new Matrix4();
-  rotationMatrix.makeRotationFromEuler(euler);
-  return rotationMatrix;
-}
-
-function getPositionOnCircle(
-  radius: number,
-  angle: number,
-  rotation: Vector3,
-  offsetY = -5
-): Vector3 {
+function getPositionOnCircle(radius: number, angle: number): Vector3 {
   const position = new Vector3();
-  const angleRadians = (angle * Math.PI) / 180;
+  const angleRadians = (angle * Math.PI + 100) / 180;
 
-  position.x = radius * Math.cos(angleRadians);
-  position.y = offsetY;
-  position.z = radius * Math.sin(angleRadians);
+  const normalizedPosition = new Vector3(
+    Math.cos(angleRadians),
+    0,
+    Math.sin(angleRadians)
+  );
 
-  const rotationMatrix = getRotationMatrix(rotation);
+  normalizedPosition.multiplyScalar(radius);
 
-  return position.applyMatrix4(rotationMatrix);
+  position.copy(normalizedPosition);
+
+  return position;
 }
 
 let t = 0;
-const CAM_RAD = 240;
 
 export const Cam = () => {
-  const [camRad, setCamRad] = useState(CAM_RAD);
-  const refCam = useRef<Camera>(null);
-  const refLookAt = useRef(new Vector3(0, -100, 0));
-  const refSphere = useRef<Mesh>(null);
-  const refSphereCast = useRef<Mesh>(null);
+  const refCam = useRef<PCam>(null);
+  const prevRotX = useRef<number>(0);
 
-  const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
+  const { pos, rotX, lookAt } = useStoreFandoms((state) =>
+    state.rickAndMorty.getPositionFromCurrentFilter()
+  );
+  const prevLookAt = useRef<Vector3>(lookAt);
 
-  const m = useDebounce(activeCharacter, activeCharacter ? 100 : 1000);
-
-  const refZoom = useRef(CAM_RAD);
-
-  // TODO : get current circle rotation AND radius, and let's go
-  // MAKE STORE
-  const CURRENT_CIRCLE_ROTATION = 0.05;
+  const zoom = pos.z;
 
   const scroll = useScroll();
   const scrollDirection = useScrollDirection();
 
-  useEffect(() => {
-    if (refCam) {
-      refCam.current?.lookAt(
-        new Vector3(refCam.current.position.x, refLookAt.current.y, 0)
-      );
-    }
-  }, [refCam]);
+  const rollRotation = useRef<Euler>(new Euler(0, 0, 0));
 
-  useFrame(({ clock, camera, raycaster }) => {
-    if (!refCam.current || !refSphere.current || !refSphereCast.current) {
+  useFrame(() => {
+    if (!refCam.current) {
       return;
     }
-    t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 30);
+    const lerpedRotX = MathUtils.lerp(prevRotX.current, rotX, 0.05);
 
-    // TODO : use zoom and yOffset when focusing on a char ?
+    rollRotation.current.set(lerpedRotX, 0, 0);
 
-    // const zoom = m
-    //   ? MathUtils.lerp(refZoom.current, 215, 0.3)
-    //   : MathUtils.lerp(refZoom.current, CAM_RAD, 0.3);
-    // refZoom.current = zoom;
+    prevRotX.current = lerpedRotX;
 
-    // const yOffset = m ? MathUtils.lerp(0, -5, 0.3) : MathUtils.lerp(-5, 0, 0.3);
+    t += getScrollDeltaFromDirection(scrollDirection, scroll.delta, 60);
 
-    const pos = getPositionOnCircle(
-      CAM_RAD,
-      t,
-      new Vector3(CURRENT_CIRCLE_ROTATION, 0, 0),
-      -5
+    const lePos = getPositionOnCircle(zoom, t);
+
+    // Rotate lePos by rollRotation
+    const rollRotationMatrix = new Matrix4().makeRotationFromEuler(
+      rollRotation.current
     );
-    refCam.current?.position.lerp(
-      pos.add(new Vector3(0, Math.sin(clock.getElapsedTime()), 0)),
-      0.5
-    );
+    lePos.applyMatrix4(rollRotationMatrix);
 
-    const sphere = refSphere.current;
+    refCam.current.position.lerp(lePos, scroll.delta > 0 ? 0.71 : 0.1);
 
-    // Getting lookAt from ray, as rotations may be a pain if cam's position is beyond 180deg
-    raycaster.intersectObject(refSphereCast.current).forEach((i) => {
-      sphere.position.copy(i.point);
-    });
+    const rollUpVector = new Vector3(0, 1, 0).applyMatrix4(rollRotationMatrix);
 
-    refCam.current.lookAt(
-      new Vector3().lerp(
-        sphere.position.clone().add(new Vector3(0, -200, 0)),
-        0.1
-      )
-    );
+    refCam.current.up.copy(rollUpVector);
 
-    refCam.current.rotateOnWorldAxis(
-      new Vector3(1, 0, 0),
-      CURRENT_CIRCLE_ROTATION
-    );
+    const newLookAt = prevLookAt.current.clone().lerp(lookAt, 0.1);
+    refCam.current.lookAt(newLookAt);
+
+    prevLookAt.current = newLookAt;
   });
 
   return (
-    <>
-      <PerspectiveCamera
-        ref={refCam}
-        position={[0, -8, camRad]}
-        fov={80}
-        far={100000}
-        near={0.1}
-        makeDefault
-      />
-      <Sphere ref={refSphereCast} scale={500}>
-        <meshBasicMaterial
-          side={BackSide}
-          transparent
-          opacity={0.5}
-          alphaTest={0.8}
-        />
-      </Sphere>
-      <Sphere ref={refSphere} scale={10} visible={false} />
-    </>
+    <PerspectiveCamera
+      ref={refCam}
+      fov={80}
+      far={100000}
+      near={0.1}
+      makeDefault
+    />
   );
 };

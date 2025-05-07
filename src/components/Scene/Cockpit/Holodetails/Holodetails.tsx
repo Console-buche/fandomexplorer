@@ -1,23 +1,65 @@
-import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
-import { MeshProps } from '@react-three/fiber';
+import { useStoreCharacter } from '@/stores/storeCharacter';
 import { TypewriterText } from '../../TypewriterText';
+import { MeshProps } from '@react-three/fiber';
+import { useMemo } from 'react';
+import { MeshStandardMaterial } from 'three';
 
-type Holodetails = {
-  character: CharacterSchema | undefined;
-} & MeshProps;
+function getEpisode(episodes: string[]) {
+  return episodes.map((episode) => episode.split('/').pop()).join(', ');
+}
 
-export const Holodetails = ({ character, ...props }: Holodetails) => {
+export const Holodetails = (props: MeshProps) => {
+  const character = useStoreCharacter((state) => state.activeCharacter);
+
+  const type = character?.type ? ` - ${character?.type}` : '';
+
+  const textMaterial = useMemo(
+    () =>
+      new MeshStandardMaterial({
+        toneMapped: false,
+        transparent: true,
+        emissive: 'purple',
+      }),
+
+    []
+  );
+
   return (
-    <mesh {...props} position={[-0.5, -0, -5]}>
-      {character?.image && (
-        <mesh rotation-y={0.5} rotation-={0.5}>
-          <planeBufferGeometry args={[0.3, 0.25]} />
-          <meshBasicMaterial map={character?.image} />
-        </mesh>
-      )}
+    <mesh {...props}>
       <TypewriterText
+        fontSize={1.5}
         typewrittenText={character?.name}
-        position={[0, -1, -10]}
+        anchorX="center"
+        position={[7, 7.5, -10]}
+        textMaterial={textMaterial}
+        delay={5}
+      />
+      <TypewriterText
+        typewrittenText={`${character?.gender ? character.gender : ''}${type}`}
+        position={[7, 5.5, -10]}
+        anchorX="center"
+        delay={5}
+        textMaterial={textMaterial}
+      />
+
+      <TypewriterText
+        typewrittenText={character?.origin.name}
+        delay={5}
+        anchorX="center"
+        position={[7, 5, -10]}
+        textMaterial={textMaterial}
+      />
+
+      <TypewriterText
+        delay={5}
+        prefix="ep. "
+        maxWidth={13}
+        letterSpacing={0.0175}
+        anchorX="center"
+        anchorY="top"
+        typewrittenText={getEpisode(character?.episode ?? [])}
+        position={[7, 4.5, -10]}
+        textMaterial={textMaterial}
       />
     </mesh>
   );

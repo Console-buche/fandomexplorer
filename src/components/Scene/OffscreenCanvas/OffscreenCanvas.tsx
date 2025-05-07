@@ -60,7 +60,7 @@ export const OffscreenCanvas = ({
 
   return (
     <canvas
-      style={{ display: 'none' }}
+      // style={{ display: 'none' }}
       ref={canvasRef}
       width={width}
       height={height}

@@ -22,6 +22,7 @@ module.exports = {
   plugins: ['react', '@typescript-eslint', 'prettier'],
   rules: {
     'react/react-in-jsx-scope': 0,
+    '@typescript-eslint/no-namespace': 0,
     'consistent-return': 0,
     'jsx-a11y/label-has-associated-control': 0,
     'prefer-object-spread': 0,

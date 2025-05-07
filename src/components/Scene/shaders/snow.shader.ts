@@ -117,24 +117,26 @@ float tv_noise(vec2 uv, float uTime) {
 void main() {
     vec4 img = texture2D(uTexture, vUv);
 
-    float intensity = tv_noise(vUv, uTime);
+    float speed = uIsImageSelected == 1 ? 2. : 1.;
+    float intensity = tv_noise(vUv, uTime*speed);
 
-        
-    vec2 modifiedUv = vUv * 2. - vec2(0.5, 1.) ;
+    vec2 modifiedUv = fract((vUv+vec2(0.05,0.035)) * 12.) ;
+
+
 
 
     vec4 activeImg = texture2D(uActiveImage, modifiedUv);
-    vec3 color = vec3(intensity);
+    vec3 color = vec3(intensity) * 2.;
 
     if (img.a < 0.1) {
         discard;
     }
 
-    float t =  uIsImageSelected == 1 ? 1. : 0.5;
+    float t =  uIsImageSelected == 1 ? .7 : 0.5;
     vec3 mixed = mix(color, img.rgb, t);
     
-    float t2 =  uIsImageSelected == 1 ? 0.75 : 0.;
-    vec3 mixedWithActive = mix(color, activeImg.rgb, t2);
-    gl_FragColor = vec4(mixedWithActive, 1.0);
+    float t2 =  uIsImageSelected == 1 ? 0.65 : .85;
+    vec3 mixedWithActive = mix(mixed, activeImg.rgb, t2);
+    gl_FragColor = vec4(mixedWithActive * 1.5, 1.0);
 }
 `;

@@ -1,70 +1,104 @@
-import { useStoreCharacter } from '@/stores/storeCharacter';
-import {
-  Box,
-  Plane,
-  ScreenSpace,
-  useScroll,
-  useTexture,
-} from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
-import { DoubleSide, MathUtils, Mesh, PerspectiveCamera } from 'three';
-import { Holoball } from './Holoball';
+import { ScreenSpace } from '@react-three/drei';
 import { Holodetails } from './Holodetails/Holodetails';
+import { Holonavigation } from './Holonavigation';
+import { Holocomputer } from './Holosearch';
+import { Interior } from './Interior';
+import { useEffect, useRef } from 'react';
+import { Group, MathUtils } from 'three';
+import { useFrame } from '@react-three/fiber';
+import { useStoreNav } from '@/stores/storeNav';
+import { shallow } from 'zustand/shallow';
 import useScrollDirection from '@/hooks/useScroll';
 
-let scrollTiltBuffer = 0;
+// TODO : fine tune oscillation to something realistic and niec
+// move camera just a bit towards the lookAt dir when transitionning, to give impression of looking around in cockpit but don't look cockpit itself
+
+let t = 0;
+type Oscillator = (time: number) => number;
+
+function createDecayingOscillator(dampingFactor = 0.06): Oscillator {
+  if (dampingFactor <= 0) {
+    throw new Error('Damping factor should be greater than 0');
+  }
+
+  return (time: number) => {
+    return Math.exp(-dampingFactor * time) * Math.sin(2 * Math.PI * time);
+  };
+}
 
 export const Cockpit = () => {
-  const tex = useTexture('assets/cockpit_cut.png');
-  const three = useThree();
-  const camera = three.camera as PerspectiveCamera;
-  const ref = useRef<Mesh>(null);
-
+  const refGroup = useRef<Group>(null);
   const scrollDirection = useScrollDirection();
-  const scroll = useScroll();
 
-  const activeCharacter = useStoreCharacter((state) => state.activeCharacter);
+  const { currentPath, previousPath } = useStoreNav(
+    (state) => ({
+      currentPath: state.currentPath,
+      previousPath: state.previousPath,
+    }),
+    shallow
+  );
 
-  const depth = 1;
-
-  const size = useMemo(() => {
-    const aspectRatio = window.innerWidth / window.innerHeight;
-    const fieldOfView = MathUtils.degToRad(camera.fov);
-    const heightAtDepth = 2 * Math.tan(fieldOfView / 2) * depth;
-    const widthAtDepth = heightAtDepth * aspectRatio;
-
-    return { widthAtDepth, heightAtDepth };
-  }, [camera.fov]);
+  // const { lookAt } = useStoreFandoms((state) =>
+  //   state.rickAndMorty.getPositionFromCurrentFilter()
+  // );
+  const m = createDecayingOscillator();
+  useEffect(() => {
+    if (currentPath !== previousPath) {
+      t = 0;
+    }
+  }, [currentPath, previousPath]);
 
   useFrame(() => {
-    // if (scroll.delta > 0) {
-    //   scrollTiltBuffer = MathUtils.clamp(scrollTiltBuffer + scroll.delta, 0, 5);
-    // } else {
-    //   scrollTiltBuffer = MathUtils.clamp(scrollTiltBuffer - 0.03, 0, 2);
-    // }
-    // const lerpedRot = MathUtils.lerp(
-    //   ref.current.rotation.z,
-    //   scrollTiltBuffer > 2 ? scrollDirection * 0.05 : 0,
+    if (!refGroup.current) {
+      return;
+    }
+
+    // refGroup.current.position.y = MathUtils.lerp(
+    //   refGroup.current.position.y,
+    //   -MathUtils.clamp(lookAt.y, -1, 1),
     //   0.1
     // );
-    // ref.current.rotation.z = lerpedRot;
+
+    t += 0.96;
+    if (Math.abs(m(t)) > 0.001) {
+      refGroup.current.position.y = MathUtils.lerp(
+        refGroup.current?.position.y,
+        m(t) * 0.25 - 0.025,
+        0.1
+      );
+    }
+
+    // Tilt full interior based on scroll direction
+    // rotate based on scroll direction
+    if (scrollDirection > 0) {
+      refGroup.current.rotation.z = MathUtils.lerp(
+        refGroup.current.rotation.z,
+        0.0125,
+        0.05
+      );
+    } else if (scrollDirection < 0) {
+      refGroup.current.rotation.z = MathUtils.lerp(
+        refGroup.current.rotation.z,
+        -0.0125,
+        0.05
+      );
+    } else {
+      refGroup.current.rotation.z = MathUtils.lerp(
+        refGroup.current.rotation.z,
+        0,
+        0.025
+      );
+    }
   });
+
   return (
-    <ScreenSpace depth={depth}>
-      <Plane
-        scale={1.01}
-        ref={ref}
-        args={[size.widthAtDepth, size.heightAtDepth]}
-        material-map={tex}
-        material-alphaTest={0.1}
-      />
-      <Holoball
-        position-z={-10}
-        position-x={size.widthAtDepth * 3.9}
-        position-y={-size.heightAtDepth}
-      />
-      <Holodetails character={activeCharacter} />
+    <ScreenSpace depth={1}>
+      <group ref={refGroup}>
+        <Interior />
+        <Holodetails position-x={-7} position-y={-1.5} />
+        <Holocomputer />
+      </group>
+      <Holonavigation position-x={-0.65} position-y={-0.2} />
     </ScreenSpace>
   );
 };

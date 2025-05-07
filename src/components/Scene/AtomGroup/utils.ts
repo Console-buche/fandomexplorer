@@ -74,6 +74,24 @@ export function positionOnCircle({
   ];
 }
 
+/**
+ * Returns the position of an element along a set of vertices
+ */
+export function positionAlongVerticesSet(
+  verticesSet: Vector3[],
+  totalElementsCount: number,
+  elementId: number
+): [number, number, number] {
+  // Get the ratio of elements per vertex
+  const ratio = totalElementsCount / verticesSet.length;
+
+  // Find the corresponding vertex for the element
+  const vertexIndex = Math.floor(elementId / ratio);
+  const vertex = verticesSet[vertexIndex];
+
+  return [vertex.x, vertex.y, vertex.z];
+}
+
 export function positionOnCircleWithVariation({
   elementId,
   elementsCount,

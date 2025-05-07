@@ -15,7 +15,7 @@ export const characterSchema = z.object({
     name: z.string(),
     url: z.string(),
   }),
-  image: z.string().url().or(z.any()),
+  image: z.string().url(),
   img: z.instanceof(Image).optional(),
   episode: z.array(z.string().url()),
   url: z.string().url(),
