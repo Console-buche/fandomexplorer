@@ -55,7 +55,7 @@ export const InteriorStartup = ({ width, height }: InteriorStartup) => {
         </group>
       )} */}
       <mesh onClick={() => updateHasStarted(true)}>
-        <planeBufferGeometry args={[width, height]} />
+        <planeGeometry args={[width, height]} />
         <meshLambertMaterial
           map={texLayerThreeScreensCenter} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
           alphaTest={0.1}

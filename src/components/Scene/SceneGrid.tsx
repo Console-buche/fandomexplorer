@@ -25,7 +25,7 @@ import { RingGrid } from './Grid/RingGrid';
 import { Ambient } from './Lights';
 import { PostProcess } from './PostProcess';
 import { MeshLineMaterial, MeshLineMaterialParameters } from 'meshline';
-import { Planets } from './Stars/Stars';
+// import { Planets } from './Stars/Stars';
 import { Geometry } from 'three-stdlib';
 
 declare global {
@@ -66,7 +66,7 @@ export const SceneGrid = () => {
       <Stars depth={1000} />
 
       {/* TODO: Optimise planets and distribute them arround as nice models. They can be sprites too taken from an atlas for performance reaons */}
-      <Planets />
+      {/* <Planets /> */}
 
       {/* <Star position={[0, 30, 0]} />
       <Star position={[12, 30, 0]} />

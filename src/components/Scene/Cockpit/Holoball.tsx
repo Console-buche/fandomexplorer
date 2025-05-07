@@ -14,7 +14,7 @@ export const Holoball = (props: MeshProps) => {
   }, [refCam]);
   return (
     <mesh ref={ref} {...props}>
-      <planeBufferGeometry args={[5, 5]} />
+      <planeGeometry args={[5, 5]} />
 
       <meshBasicMaterial transparent depthTest={false}>
         <RenderTexture attach="map" anisotropy={16}>

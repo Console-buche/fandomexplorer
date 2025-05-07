@@ -196,14 +196,14 @@ export const HolonavigationButton = ({
             vertexShader={vertexShaderHolonavigation}
             transparent
           />
-          <planeBufferGeometry args={[0.25, 0.13]} ref={refDoor}>
+          <planeGeometry args={[0.25, 0.13]} ref={refDoor}>
             <instancedBufferAttribute
               attach="attributes-doorPosition"
               array={leDoorPosition}
               itemSize={1}
               count={2}
             />
-          </planeBufferGeometry>
+          </planeGeometry>
           {Array.from({ length: 2 }, (_, i) => i).map((doorId) => (
             <Instance key={doorId} />
           ))}

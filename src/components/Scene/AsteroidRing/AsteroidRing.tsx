@@ -57,7 +57,7 @@ export const AsteroidRing = ({ radius, ...meshProps }: AsteroidRing) => {
 
   return (
     <mesh {...meshProps} ref={meshRef}>
-      <circleBufferGeometry args={[radius, 128]} />
+      <circleGeometry args={[radius, 128]} />
       <shaderMaterial
         ref={matRef}
         side={DoubleSide}

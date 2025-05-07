@@ -49,7 +49,7 @@ export const Holocomputer = (props: MeshProps) => {
       onPointerEnter={() => currentPath === '/' && setIsEditing(true)}
       onPointerLeave={() => currentPath === '/' && setIsEditing(false)}
     >
-      <planeBufferGeometry args={[0.5, 0.2]} />
+      <planeGeometry args={[0.5, 0.2]} />
       <meshLambertMaterial
         color="purple"
         ref={refMat}

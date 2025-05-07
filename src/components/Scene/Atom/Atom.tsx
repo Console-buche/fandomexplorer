@@ -96,7 +96,7 @@ export const Atom = ({
       {...AtomProps}
       onPointerEnter={() => updateActiveItem(character)}
     >
-      <planeBufferGeometry args={[2.5, 2]}>
+      <planeGeometry args={[2.5, 2]}>
         <instancedBufferAttribute
           attach="attributes-tileIndex"
           ref={refTIndex}
@@ -104,7 +104,7 @@ export const Atom = ({
           count={tIndexAttr.length / 3}
           itemSize={1}
         />
-      </planeBufferGeometry>
+      </planeGeometry>
     </mesh>
   );
 };

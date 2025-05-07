@@ -153,7 +153,7 @@ export const Interior = () => {
         />
       </Plane>
       <mesh>
-        <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
+        <planeGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
 
         {/* @ts-ignore */}
         <a.meshLambertMaterial
@@ -169,7 +169,7 @@ export const Interior = () => {
       </mesh>
 
       <mesh position-z={-0.001} position-y={-0.001}>
-        <planeBufferGeometry
+        <planeGeometry
           args={[size.widthAtDepth + 0.01, size.heightAtDepth + 0.01]}
         />
 
@@ -184,7 +184,7 @@ export const Interior = () => {
       </mesh>
 
       <mesh position-z={-0.0001} position-y={-0.002}>
-        <planeBufferGeometry
+        <planeGeometry
           args={[size.widthAtDepth + 0.02, size.heightAtDepth + 0.01]}
         />
         {/* @ts-ignore */}
@@ -202,7 +202,7 @@ export const Interior = () => {
       </mesh>
 
       <mesh position-z={0.01} position-y={-0.002}>
-        <planeBufferGeometry
+        <planeGeometry
           args={[size.widthAtDepth + 0.02, size.heightAtDepth + 0.01]}
         />
         {/* @ts-ignore */}
@@ -220,7 +220,7 @@ export const Interior = () => {
       </mesh>
 
       <mesh position-z={-0.0001} position-y={-0.002}>
-        <planeBufferGeometry
+        <planeGeometry
           args={[size.widthAtDepth + 0.01, size.heightAtDepth + 0.01]}
         />
         {/* @ts-ignore */}
@@ -239,7 +239,7 @@ export const Interior = () => {
 
       {/* THREE SCREENS PARTS */}
       <mesh>
-        <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
+        <planeGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
         {/* @ts-ignore */}
         <a.meshLambertMaterial
           map={texLayerThreeScreensRight} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm
@@ -257,7 +257,7 @@ export const Interior = () => {
       <InteriorStartup width={size.widthAtDepth} height={size.heightAtDepth} />
 
       <mesh>
-        <planeBufferGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
+        <planeGeometry args={[size.widthAtDepth, size.heightAtDepth]} />
         {/* @ts-ignore */}
         <a.meshLambertMaterial
           map={texLayerThreeScreensLeft} // TODO: render some button in a different RenderTexture, to control light pulsing diffrent rythm

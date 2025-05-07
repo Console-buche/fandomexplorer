@@ -244,7 +244,7 @@ export const AtomInstanced = ({
           ref={refBox}
           material={materialAtomRaycast}
         >
-          <circleBufferGeometry args={[1.5, 12, 12]} ref={refBoxGeometry} />
+          <circleGeometry args={[1.5, 12, 12]} ref={refBoxGeometry} />
         </mesh>
       )}
 
