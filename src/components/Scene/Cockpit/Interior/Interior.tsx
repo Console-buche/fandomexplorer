@@ -57,7 +57,7 @@ export const Interior = () => {
   const refShipCables = useRef<MeshLambertMaterial>(null);
   const refShaderMaterialScreen = useRef<ShaderMaterial>(null);
 
-  const scrollDirection = useScrollDirection();
+  const { scrollDirection } = useScrollDirection();
   const scroll = useScroll();
 
   const depth = 1;
@@ -123,13 +123,14 @@ export const Interior = () => {
 
     refThreeScreensRight.current.emissiveIntensity = tScrollRight;
     refThreeScreensLeft.current.emissiveIntensity = tScrollLeft;
-    tScrollRight =
-      scroll.delta > 0 && scrollDirection === -1
+    
+    // Update right screen glow when scrolling left
+    tScrollRight = scrollDirection === -1
         ? Math.min(tScrollRight + 2, 25)
         : Math.max(tScrollRight - 2, 2);
 
-    tScrollLeft =
-      scroll.delta > 0 && scrollDirection === 1
+    // Update left screen glow when scrolling right
+    tScrollLeft = scrollDirection === 1
         ? Math.min(tScrollLeft + 2, 25)
         : Math.max(tScrollLeft - 2, 2);
   });

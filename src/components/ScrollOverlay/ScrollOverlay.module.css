@@ -1,0 +1,60 @@
+.scrollOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.leftChevron,
+.rightChevron {
+  transform: scale(2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 80px;
+  width: 60px;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.leftChevron svg,
+.rightChevron svg {
+  width: 40px;
+  height: 40px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.message {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+}

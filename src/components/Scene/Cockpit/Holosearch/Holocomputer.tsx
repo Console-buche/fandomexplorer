@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Holosearch } from './Holosearch';
-import { MeshProps, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useStoreNav } from '@/stores/storeNav';
 import { useTexture } from '@react-three/drei';
 import { Color, Mesh, MeshLambertMaterial } from 'three';
 
-export const Holocomputer = (props: MeshProps) => {
+export const Holocomputer = () => {
   const tex = useTexture('assets/windows_blue_screen.png');
   const [isEditing, setIsEditing] = useState(false);
   const currentPath = useStoreNav((state) => state.currentPath);
@@ -35,10 +35,10 @@ export const Holocomputer = (props: MeshProps) => {
   // const emissiveIntensity = isEditing ? 20 : 0;
   useFrame(() => {
     if (!ref.current) {
-      return
+      return;
     }
     ref.current.position.y = -0.23 + Math.sin(Date.now() * 0.001) * 0.005;
-  })
+  });
 
   return (
     <mesh
@@ -55,10 +55,8 @@ export const Holocomputer = (props: MeshProps) => {
         ref={refMat}
         toneMapped={false}
         emissive="purple"
-        // map={tex}
         transparent
         opacity={opacity}
-        // depthWrite={false}
         emissiveIntensity={emissiveIntensity}
       />
 

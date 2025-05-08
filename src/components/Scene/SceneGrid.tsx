@@ -1,21 +1,14 @@
 import useScrollDirection from '@/hooks/useScroll';
 import { Page404 } from '@/pages/404/Page404';
 import { useQueryGetCharactersFromFile } from '@/services/getCharacters/useQueryGetCharacters';
-import { ScrollControls, Stars, Stats, Trail } from '@react-three/drei';
-import {
-  Canvas,
-  extend,
-  MaterialProps,
-  useFrame,
-  useThree,
-} from '@react-three/fiber';
+import { ScrollControls, Stars, Trail } from '@react-three/drei';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import {
   BufferGeometry,
   Material,
   MathUtils,
   Mesh,
-  MeshBasicMaterial,
   NormalBlending,
   Vector2,
 } from 'three';
@@ -26,7 +19,6 @@ import { Ambient } from './Lights';
 import { PostProcess } from './PostProcess';
 import { MeshLineMaterial, MeshLineMaterialParameters } from 'meshline';
 // import { Planets } from './Stars/Stars';
-import { Geometry } from 'three-stdlib';
 
 declare global {
   namespace JSX {

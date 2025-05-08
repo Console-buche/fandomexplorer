@@ -40,7 +40,7 @@ export const RingGrid = ({
 }: Grid) => {
   const canvas = useOffscreenCanvasStore((state) => state.offscreenCanvas);
   const refShaderMat = useRef<ShaderMaterial>(null);
-  const scrollDirection = useScrollDirection();
+  const { scrollDirection } = useScrollDirection();
   const activeStatus = useStoreFandoms(
     (state) => state.rickAndMorty.activeStatus
   );
@@ -138,13 +138,15 @@ export const RingGrid = ({
 
     refShaderMat.current.uniforms.uTime.value += 0.01;
     refShaderMat.current.uniformsNeedUpdate = true;
-    // ref.current.rotation.y += (scroll.delta * scrollDirection) / 2;
-
-    // rotate mesh for tilt effect on scroll
+    // Apply rotation based on scroll direction
+    const scrollSpeed = scrollDirection !== 0 ? 0.01 : 0.05;
+    const targetRotation = scrollDirection * 0.01;
+    
+    // Lerp to target rotation (0 when not scrolling)
     const lerpedRot = MathUtils.lerp(
       ref.current.rotation.z,
-      scrollDirection * 0.01,
-      0.01
+      targetRotation,
+      scrollSpeed
     );
 
     ref.current.rotation.z = lerpedRot;

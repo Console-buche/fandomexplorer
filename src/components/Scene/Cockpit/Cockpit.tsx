@@ -28,7 +28,7 @@ function createDecayingOscillator(dampingFactor = 0.06): Oscillator {
 
 export const Cockpit = () => {
   const refGroup = useRef<Group>(null);
-  const scrollDirection = useScrollDirection();
+  const { scrollDirection } = useScrollDirection();
 
   const { currentPath, previousPath } = useStoreNav(
     (state) => ({
@@ -38,9 +38,6 @@ export const Cockpit = () => {
     shallow
   );
 
-  // const { lookAt } = useStoreFandoms((state) =>
-  //   state.rickAndMorty.getPositionFromCurrentFilter()
-  // );
   const m = createDecayingOscillator();
   useEffect(() => {
     if (currentPath !== previousPath) {
@@ -53,12 +50,6 @@ export const Cockpit = () => {
       return;
     }
 
-    // refGroup.current.position.y = MathUtils.lerp(
-    //   refGroup.current.position.y,
-    //   -MathUtils.clamp(lookAt.y, -1, 1),
-    //   0.1
-    // );
-
     t += 0.96;
     if (Math.abs(m(t)) > 0.001) {
       refGroup.current.position.y = MathUtils.lerp(
@@ -68,8 +59,6 @@ export const Cockpit = () => {
       );
     }
 
-    // Tilt full interior based on scroll direction
-    // rotate based on scroll direction
     if (scrollDirection > 0) {
       refGroup.current.rotation.z = MathUtils.lerp(
         refGroup.current.rotation.z,
