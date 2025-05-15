@@ -16,53 +16,61 @@ const useScrollDirection = () => {
   const lastScrollTime = useRef<number>(0);
   const scrollMomentum = useRef<number>(0);
 
+  const accumulatedDelta = useRef<number>(0);
+
   useEffect(() => {
     const handleScroll = (event: WheelEvent) => {
       if (useStoreFandoms.getState().rickAndMorty.hasStarted) {
         hasScrolled.current = true;
       }
 
-      // Prevent default to avoid browser scroll behavior interfering
       event.preventDefault();
 
       const { deltaX, deltaY } = event;
-      const direction =
-        Math.abs(deltaY) > Math.abs(deltaX)
-          ? -Math.sign(deltaY)
-          : -Math.sign(deltaX);
 
-      // Update momentum based on scroll intensity with a more controlled acceleration
-      const scrollIntensity = Math.max(Math.abs(deltaY), Math.abs(deltaX));
-      // Cap the maximum momentum to prevent excessive speed
-      const MAX_MOMENTUM = 2.5;
-      // Use a smaller multiplier for more gradual acceleration
-      scrollMomentum.current = Math.min(
-        scrollMomentum.current + scrollIntensity * 0.005,
-        MAX_MOMENTUM
-      );
+      const isPrimaryVertical = Math.abs(deltaY) > Math.abs(deltaX);
+      const primaryDelta = isPrimaryVertical ? deltaY : deltaX;
 
-      if (isScrollDirection(direction)) {
-        setScrollDirection(direction);
+      const normalizedDelta =
+        Math.sign(primaryDelta) * Math.min(Math.abs(primaryDelta), 100);
+
+      accumulatedDelta.current += normalizedDelta;
+
+      const DELTA_THRESHOLD = 5;
+      if (Math.abs(accumulatedDelta.current) >= DELTA_THRESHOLD) {
+        const direction = -Math.sign(
+          accumulatedDelta.current
+        ) as ScrollDirection;
+
+        if (isScrollDirection(direction)) {
+          setScrollDirection(direction);
+        }
+
+        const scrollIntensity = Math.abs(accumulatedDelta.current);
+        const MAX_MOMENTUM = 2.5;
+        scrollMomentum.current = Math.min(
+          scrollMomentum.current + scrollIntensity * 0.01,
+          MAX_MOMENTUM
+        );
+
+        accumulatedDelta.current = 0;
       }
 
-      // Reset the timer that will eventually reset direction to 0
       if (scrollTimerRef.current) {
         clearTimeout(scrollTimerRef.current);
       }
 
       lastScrollTime.current = Date.now();
 
-      // Set a new timer to reset direction to 0 after a short delay
       scrollTimerRef.current = setTimeout(() => {
         setScrollDirection(0);
         scrollMomentum.current = 0;
-      }, 150);
+        accumulatedDelta.current = 0;
+      }, 200);
     };
 
-    // Add event listener to window
     window.addEventListener('wheel', handleScroll, { passive: false });
 
-    // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener('wheel', handleScroll);
       if (scrollTimerRef.current) {
