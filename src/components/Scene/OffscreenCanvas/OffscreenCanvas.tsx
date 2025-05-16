@@ -1,7 +1,6 @@
 import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
 import { useEffect, useRef, useState } from 'react';
 import { useOffscreenCanvasStore } from './offscreenCanvas.store';
-import { useFrame, useThree } from '@react-three/fiber';
 
 interface OffscreenCanvasProps {
   width: number;
@@ -33,29 +32,59 @@ export const OffscreenCanvas = ({
     if (canvas && ctx) {
       const imgWidth = 128;
       const imgHeight = 128;
+      let loadedImagesCount = 0;
+      const totalImages = imgs.filter(Boolean).length;
+      
+      // Clear canvas first to prevent artifacts
+      ctx.clearRect(0, 0, width, height);
 
-      imgs.forEach((im, index) => {
-        if (im) {
+      // Create a promise for each image load
+      const loadImage = (imageUrl: string, index: number) => {
+        return new Promise<void>((resolve) => {
           const img = new Image();
-          img.src = im;
+          img.crossOrigin = 'anonymous';
+          
+          img.onload = () => {
+            const x = (index % (width / imgWidth)) * imgWidth;
+            const y = height - Math.floor(index / (width / imgWidth) + 1) * imgHeight;
+            ctx.drawImage(img, x, y, imgWidth, imgHeight);
+            loadedImagesCount++;
+            
+            if (loadedImagesCount === totalImages) {
+              setIsRdy(true);
+              setOffscreenCanvas(canvas, status);
+            }
+            resolve();
+          };
+          
+          img.onerror = () => {
+            console.error(`Failed to load image: ${imageUrl}`);
+            loadedImagesCount++;
+            
+            if (loadedImagesCount === totalImages) {
+              setIsRdy(true);
+              setOffscreenCanvas(canvas, status);
+            }
+            resolve();
+          };
+          
+          // Set properties and start loading
           img.width = imgWidth;
           img.height = imgHeight;
-          img.crossOrigin = 'anonymous';
+          img.src = imageUrl; // Set src last to start loading
+        });
+      };
 
-          const x = (index % (width / imgWidth)) * imgWidth;
-          const y =
-            height - Math.floor(index / (width / imgWidth) + 1) * imgHeight;
-
-          img.onload = () => {
-            ctx.drawImage(img, x, y, imgWidth, imgHeight);
-          };
-        }
-      });
-
-      setIsRdy(true);
+      // Load all images
+      Promise.all(
+        imgs.map((imageUrl, index) => {
+          if (imageUrl) {
+            return loadImage(imageUrl, index);
+          }
+          return Promise.resolve();
+        })
+      );
     }
-
-    setOffscreenCanvas(canvas, status);
   }, [cellSize, width, height, setOffscreenCanvas, status, imgs]);
 
   return (

@@ -3,12 +3,13 @@ import { Holodetails } from './Holodetails/Holodetails';
 import { Holonavigation } from './Holonavigation';
 import { Holocomputer } from './Holosearch';
 import { Interior } from './Interior';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Group, MathUtils } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useStoreNav } from '@/stores/storeNav';
 import { shallow } from 'zustand/shallow';
 import useScrollDirection from '@/hooks/useScroll';
+import { preloadTextures } from '@/utils/texturePreloader';
 
 // TODO : fine tune oscillation to something realistic and niec
 // move camera just a bit towards the lookAt dir when transitionning, to give impression of looking around in cockpit but don't look cockpit itself
@@ -29,6 +30,14 @@ function createDecayingOscillator(dampingFactor = 0.06): Oscillator {
 export const Cockpit = () => {
   const refGroup = useRef<Group>(null);
   const { scrollDirection } = useScrollDirection();
+  const [texturesLoaded, setTexturesLoaded] = useState(false);
+
+  // Preload textures when component mounts
+  useEffect(() => {
+    preloadTextures().then(() => {
+      setTexturesLoaded(true);
+    });
+  }, []);
 
   const { currentPath, previousPath } = useStoreNav(
     (state) => ({

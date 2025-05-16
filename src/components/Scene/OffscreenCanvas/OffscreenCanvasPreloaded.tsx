@@ -1,7 +1,6 @@
 import { CharacterSchema } from '@/services/getCharacters/userQueryGetCharacters.schema';
 import { useEffect, useRef, useState } from 'react';
 import { useOffscreenCanvasStore } from './offscreenCanvas.store';
-import { useFrame, useThree } from '@react-three/fiber';
 
 interface OffscreenCanvasProps {
   size: number;
@@ -25,20 +24,31 @@ export const OffscreenCanvasPreloaded = ({
     const ctx = canvas?.getContext('2d');
 
     if (canvas && ctx) {
+      // Clear canvas first
+      ctx.clearRect(0, 0, size, size);
+      
       const img = new Image();
-      img.src = imgs;
-      img.width = size;
-      img.height = size;
       img.crossOrigin = 'anonymous';
-
+      
+      // Set up onload handler before setting src
       img.onload = () => {
         ctx.drawImage(img, 0, 0, size, size);
+        setIsRdy(true);
+        setOffscreenCanvas(canvas, status);
       };
-
-      setIsRdy(true);
+      
+      img.onerror = () => {
+        console.error(`Failed to load atlas image: ${imgs}`);
+        // Still set the canvas to prevent blocking the app
+        setIsRdy(true);
+        setOffscreenCanvas(canvas, status);
+      };
+      
+      // Set properties and start loading
+      img.width = size;
+      img.height = size;
+      img.src = imgs; // Set src last to start loading
     }
-
-    setOffscreenCanvas(canvas, status);
   }, [size, setOffscreenCanvas, status, imgs]);
 
   return (
