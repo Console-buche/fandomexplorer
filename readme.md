@@ -23,3 +23,6 @@ Also wanted to try out zustand.
 
 WIP and on hold. Haven't touched in a while, fell into other rabbit holes...
 
+# Notes
+
+yep just testing my agent!
