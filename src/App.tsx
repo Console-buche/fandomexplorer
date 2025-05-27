@@ -8,6 +8,8 @@ import './style/index.css';
 function App() {
   const queryClient = useQueryClient();
 
+  console.log('Hey brownbag people ! AI is cool !');
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className={layoutStyle}>
