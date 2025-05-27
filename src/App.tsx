@@ -8,7 +8,7 @@ import './style/index.css';
 function App() {
   const queryClient = useQueryClient();
 
-  console.log('hey!');
+  console.log('Last test for the demo!');
 
   return (
     <QueryClientProvider client={queryClient}>
