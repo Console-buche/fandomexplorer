@@ -1,3 +1,4 @@
 TODO : write me
 
-Fandom explorer 
+Fandom explorateur, c'est mieux
+
